@@ -6,21 +6,27 @@
 
 #include "rtweekend.h"
 
+
 #include "camera.h"
+#include "camera_parallel.h"
+#include "color.h"
+#include "color_array.h"
 #include "hittable.h"
 #include "hittable_list.h"
+#include "interval.h"
 #include "material.h"
-#include "sphere.h"
-#include "write.h"
-#include "color_array.h"
-#include "camera_parallel.h"
 #include "parallel.h"
-#include "point3_animated.h"
 #include "path.h"
+#include "point3_animated.h"
+#include "ray.h"
+#include "sphere.h"
+#include "vec3.h"
+#include "write.h"
 
 
 int main()
 {
+	
 	// MPI
 	MPI_Init(NULL, NULL);
 
@@ -78,7 +84,7 @@ int main()
 	cam_ptr = &cam;
 
 	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 400;
+	cam.image_width = 100;
 	cam.samples_per_pixel = 100;
 	cam.max_depth = 50;
 	cam.initialize();
@@ -113,7 +119,7 @@ int main()
 	for (int i = 0; i < num_frames; i++)
 	{
 		// frame i
-		std::string file_name = "frame-" + std::to_string(i);
+		std::string file_name = "frame-" + std::to_string(i) + ".ppm";
 		std::ofstream file(file_name);
 
 		// moving the camera

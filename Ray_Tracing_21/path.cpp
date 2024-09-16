@@ -1,8 +1,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "vec3.h"
-#include "point3_animated.h"
+
 #include "path.h"
 
 

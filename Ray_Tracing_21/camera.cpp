@@ -2,6 +2,16 @@
 
 #include "rtweekend.h"
 
+#include "camera.h"
+
+#include "color.h"
+#include "color_array.h"
+#include "hittable.h"
+#include "hittable_list.h"
+#include "material.h"
+#include "ray.h"
+#include "vec3.h"
+
 
 void camera::render(const hittable& world, color_array& c_a) {
 	initialize();

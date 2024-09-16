@@ -1,7 +1,13 @@
 #ifndef CAMERA_PARALLEL_H
 #define CAMERA_PARALLEL_H
 
+#include "rtweekend.h"
+
 #include "camera.h"
+#include "color.h"
+#include "color_array.h"
+#include "hittable.h"
+#include "vec3.h"
 
 class camera_parallel : public camera
 {

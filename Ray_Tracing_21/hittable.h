@@ -1,9 +1,11 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "rtweekend.h"
+
+#include "interval.h"
 #include "ray.h"
 #include "vec3.h"
-#include "interval.h"
 #include <memory>
 
 class material;

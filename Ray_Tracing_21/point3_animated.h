@@ -1,6 +1,8 @@
 #ifndef POINT3_ANIMATED_H
 #define POINT3_ANIMATED_H
 
+#include "rtweekend.h"
+
 #include "vec3.h"
 
 class point3_animated
@@ -11,7 +13,7 @@ public:
     point3_animated(double _time) : time(_time) { loc = point3(); }
     point3_animated(double& _x, double& _y, double& _z, double& _time) : time(_time) {point3 loc(_x,_y,_z); }
 	point3_animated(point3 _loc, double _time) : time(_time), loc(_loc) {}
-	point3_animated(point3_animated& _point): time(_point.time), loc(_point.loc) {}
+	point3_animated(const point3_animated& _point): time(_point.time), loc(_point.loc) {}
 	
     point3 return_loc() const { return loc; }
 	const double& return_time() const { return time; }

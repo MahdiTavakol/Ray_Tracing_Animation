@@ -1,6 +1,10 @@
 #ifndef COLOR_ARRAY_H
 #define COLOR_ARRAY_H
 
+#include "rtweekend.h"
+
+
+
 #include <stdlib.h>
 #include <iostream>
 #include "interval.h"
@@ -13,6 +17,7 @@ public:
     color_array(const int& _width, const int& _height, color_data** _color_data);
     color_array(const int& _width, const int& _height, color_data* _color_data);
     color_array(const int& _width, const int& _height);
+    color_array(const color_array& );
     color_array();
     ~color_array();
 

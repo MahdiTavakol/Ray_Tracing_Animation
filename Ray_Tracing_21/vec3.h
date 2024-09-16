@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <algorithm>
 
+#include "rtweekend.h"
+
 class vec3 {
 public:
     double e[3];

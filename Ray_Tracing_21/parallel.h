@@ -1,6 +1,9 @@
 #ifndef PARALLEL_H
 #define PARALLEL_H
 
+#include "rtweekend.h"
+
+
 #include <iostream>
 #include <mpi.h>
 #include "camera_parallel.h"
