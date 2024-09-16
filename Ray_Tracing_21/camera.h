@@ -5,10 +5,12 @@
 
 #include "rtweekend.h"
 
-#include "hittable.h"
-#include "material.h"
-#include "color_array.h"
 
+#include "color.h"
+#include "hittable.h";
+#include "hittable_list.h"
+
+class color_array;
 
 
 class camera {
@@ -26,7 +28,6 @@ public:
 
 	double defocus_angle = 0;
 	double focus_dist = 10;
-
 
 
 	void render(const hittable& world, color_array& c_a);
@@ -50,7 +51,8 @@ protected:
 
 	point3 defocus_disk_sample() const;
 
-	color ray_color(const ray& r, int depth, const hittable& world);
+
+	color ray_color(const ray& r, int depth, const hittable& world) const;
 };
 
 

@@ -2,6 +2,9 @@
 #define WRITE_H
 
 #include <fstream>
+
+#include "rtweekend.h"
+
 #include "color_array.h"
 
 class write {

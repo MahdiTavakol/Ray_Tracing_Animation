@@ -1,6 +1,8 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "rtweekend.h"
+
 class interval {
 public:
 	double min, max;
@@ -14,7 +16,7 @@ public:
 		return max - min;
 	}
 
-	bool contrains(double x) const {
+	bool contains(double x) const {
 		return min <= x && x <= max;
 	}
 
@@ -33,8 +35,7 @@ public:
 	static const interval empty, universe;
 };
 
-const interval interval::empty = interval(+infinity, -infinity);
-const interval interval::universe = interval(-infinity,+infinity);
+
 
 
 #endif

@@ -3,6 +3,12 @@
 
 #include <vector>
 #include <string>
+
+#include "rtweekend.h"
+
+
+
+#include "vec3.h"
 #include "point3_animated.h"
 
 class path
@@ -13,7 +19,10 @@ public:
 	path(point3& _point); // For backward compatibility with the static case.
 	~path() {}
 
-	const point3_animated& operator[](int i) const { return locs[i]; }
+	point3& operator[](int i) const {
+		point3 output = locs[i].return_loc();
+		return output;
+	}
 
 
 private:

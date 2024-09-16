@@ -9,7 +9,7 @@ void hittable_list::add(shared_ptr<hittable> object)
 	objects.push_back(object);
 }
 
-bool hittable_list::hit(const ray& r, interval ray_t, hit_record& rec) const override
+bool hittable_list::hit(const ray& r, interval ray_t, hit_record& rec) const 
 {
 	hit_record temp_rec;
 	bool hit_anything = false;

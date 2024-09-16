@@ -1,8 +1,12 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "rtweekend.h"
+
 #include "hittable.h"
 #include "vec3.h"
+#include "ray.h"
+#include "interval.h"
 #include <memory>
 #include <algorithm>
 

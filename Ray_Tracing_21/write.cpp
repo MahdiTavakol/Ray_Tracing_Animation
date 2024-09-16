@@ -3,7 +3,8 @@
 #include <fstream>
 #include "color_array.h"
 
-write::write(std::ofstream* _file, color_array* _colors, int _image_width, int _image_height) : file(_file), colors(_colors), image_width(_image_width), image_height(_image_height) {}
+write::write(std::ofstream* _file, color_array* _colors, int _image_width, int _image_height) : 
+	file(_file), colors(_colors), image_width(_image_width), image_height(_image_height) {}
 	
 write::~write()
 {
