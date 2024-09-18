@@ -7,7 +7,7 @@
 
 
 #include "color.h"
-#include "hittable.h";
+#include "hittable.h"
 #include "hittable_list.h"
 
 class color_array;
