@@ -28,11 +28,11 @@ protected:
 inline point3_animated interpolate(const point3_animated& first, const point3_animated& second, double _time) {
     point3_animated output(_time);
 
-    if (abs(_time - first.time) < 0.001) {
+    if (std::abs(_time - first.time) < 0.001) {
         output = first;
         return output;
     }
-    if (abs(_time - second.time) < 0.001) {
+    if (std::abs(_time - second.time) < 0.001) {
         output = second;
         return output;
     }
