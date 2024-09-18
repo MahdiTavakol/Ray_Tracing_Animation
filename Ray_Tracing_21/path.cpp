@@ -81,7 +81,7 @@ void path::interpolate_points()
 		// Finding the first frame in the input file that is bigger than the frame i to be used in the interpolation 
 		while (init_time <= time)
 		{
-			if (abs(init_time-time) < 0.001)
+			if (std::abs(init_time-time) < 0.001)
 			{
 				point3_animated _loc(init_locs[i]);
 				locs.push_back(_loc);
