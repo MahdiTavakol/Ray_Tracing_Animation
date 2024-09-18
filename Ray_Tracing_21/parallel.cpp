@@ -43,7 +43,7 @@ void parallel::gather() {
 
 
     MPI_Allgather(colors, num_double_data, MPI_DOUBLE, colors_all, num_double_data, MPI_DOUBLE, MPI_world);
-    c_array_all = color_array(cam->image_width, cam->image_height, colors_all); // This line is the problem..
+    c_array_all = color_array(cam->image_width, cam->image_height, colors_all);
 }
 
 int parallel::return_rank() const {

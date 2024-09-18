@@ -84,7 +84,7 @@ int main()
 	cam_ptr = &cam;
 
 	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 100;
+	cam.image_width = 1920;
 	cam.samples_per_pixel = 100;
 	cam.max_depth = 50;
 	cam.initialize();
@@ -150,6 +150,13 @@ int main()
 		}
 
 
+	}
+
+	if (rank == 0)
+	{
+		std::clog << "Combining the frames into a .mp4 file " << std::endl;
+		std::string command = "ffmpeg -framerate " + std::to_string(fps) + " - i '*.ppm' - c:v libx264 - b : v 1M - pix_fmt yuv420p RT14.mp4";
+		system(command.c_str());
 	}
 
 	if (rank == 0)  
