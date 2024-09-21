@@ -12,11 +12,12 @@ set(CMAKE_CXX_COMPILER mpiicpx)
 
 # List of source files
 set(SOURCES
-    RayTracing_14.cpp
+    RayTracing_15.cpp
     camera.cpp
     camera_parallel.cpp
     color.cpp
     color_array.cpp
+    input.cpp
     interval.cpp
     parallel.cpp
     path.cpp
@@ -26,4 +27,4 @@ set(SOURCES
 )
 
 # Define the executable
-add_executable(RayTracing_14 ${SOURCES})
+add_executable(RayTracing_15 ${SOURCES})
