@@ -110,7 +110,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10), input_
 
 void input::input_logger_function(int argc, char** argv)
 {
-	logfile.open("RayTracingInput.log",std::ios::out);
+	logfile.open("RayTracingInput.log", std::ios::out);
 	if (!logfile.is_open())
 		std::cerr << "Cannot open the RayTracing.log file for logging" << std::endl;
 	else
@@ -130,6 +130,15 @@ void input::input_logger_function(int argc, char** argv)
 		logfile << "num_seconds = " << this->num_seconds << std::endl;
 	}
 	logfile.close();
+
+	std::cout << "Start making a movie using with the following properties:" << std::endl;
+	std::cout << "image_width = " << this->image_width << std::endl;
+	std::cout << "samples_per_pixel = " << this->samples_per_pixel << std::endl;
+	std::cout << "max_depth = " << this->max_depth << std::endl;
+	std::cout << "vfov = " << this->vfov << std::endl;
+	std::cout << "aspect_ratio = " << this->width_ratio << "/" << this->height_ratio << std::endl;
+	std::cout << "fps = " << this->fps << std::endl;
+	std::cout << "num_seconds = " << this->num_seconds << std::endl;
 }
 
 void input::setup_camera(camera* cam) const
