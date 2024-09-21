@@ -9,9 +9,12 @@
 #include "hittable.h"
 #include "vec3.h"
 
+class parallel;
+
 class camera_parallel : public camera
 {
 public:
+    friend class parallel;
     camera_parallel(const int _width_min, const int _width_max, const int _height_min, const int _height_max);
     camera_parallel();
     void render(const hittable& world, color_array& c_a);
