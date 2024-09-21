@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 {
 	
 	// MPI
-	MPI_Init(NULL, NULL);
+	MPI_Init(&argc,&argv);
 
 	// Parsing input arguments
 	input in(argc, argv);
@@ -55,8 +55,9 @@ int main(int argc, char **argv)
 					// diffuse
 					auto albedo = color::random() * color::random();
 					sphere_material = make_shared<lambertian>(albedo);
-					auto center2 = center + vec3(0, random_double(0, 0.5), 0);
-					world.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
+					world.add(make_shared<sphere>(center, 0.2, sphere_material));
+					//auto center2 = center + vec3(0, random_double(0, 0.5), 0);
+					//world.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
 				}
 				else if (choose_mat < 0.95) {
 					// metal
@@ -100,10 +101,15 @@ int main(int argc, char **argv)
 	// Creating the trajectory of the camera
 	point3 center(13, 2, 3);
 	double radius = 13.49;
-	int num_seconds = 10;
-	int fps = 60;
 	double theta = 45.0;
+
+	// The movie quality
+	int fps;
+	int num_seconds;
+	in.fps_num_seconds(fps, num_seconds);
 	int num_frames = fps * num_seconds;
+
+	// Creating the camera location sequence
 	path pth(center, radius, num_seconds, fps, theta);
 
 	// knowing the rank of a process is required for priting the output
