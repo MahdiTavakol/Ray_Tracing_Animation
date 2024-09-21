@@ -84,7 +84,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10), input_
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
 			int _int = convert_char<int>(argv[iarg + 1]);
-			this->fps = _int;
+			this->num_seconds = _int;
 			iarg += 2;
 		}
 		else
@@ -110,7 +110,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10), input_
 
 void input::input_logger_function(int argc, char** argv)
 {
-	logfile.open("RayTracingInput.log");
+	logfile.open("RayTracingInput.log",std::ios::out);
 	if (!logfile.is_open())
 		std::cerr << "Cannot open the RayTracing.log file for logging" << std::endl;
 	else
@@ -118,7 +118,7 @@ void input::input_logger_function(int argc, char** argv)
 		logfile << "The input: " << std::endl;
 		for (int i = 0; i < argc; i++)
 			logfile << argv[i] << " ";
-		logfile << "The parsed values: " << std::endl;
+		logfile << std::endl << "The parsed values: " << std::endl;
 
 		logfile << argv[0] << std::endl;
 		logfile << "image_width = " << this->image_width << std::endl;
