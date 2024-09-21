@@ -1,183 +1,53 @@
-#include <string>
-#include <cstring>
-#include <sstream>
-#include <iostream>
-#include <mpi.h>
+#include "parallel.h"
 
-#include "input.h"
+parallel::parallel(camera_parallel* _cam, hittable_list* _world) : cam(_cam), world(_world) {
+    // MPI variables
+    MPI_world = MPI_COMM_WORLD;
+    MPI_Comm_rank(MPI_world, &rank);
+    MPI_Comm_size(MPI_world, &size);
 
+    // distribute load
+    width_per_node = int(cam->image_width / size + 1);
+    height_per_node = cam->image_height;
+    width_min = rank * width_per_node;
+    width_max = width_min + width_per_node;
+    height_min = 0;
+    height_max = cam->image_height;
+    cam->set_range(width_min, width_max, height_min, height_max);
 
-input::input(int argc, char** argv) :image_width(1920), samples_per_pixel(100), max_depth(50),
-vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10), input_logger(false)
-{
-	int iarg = 1;
-	while (iarg < argc)
-	{
-		if (!strcmp(argv[iarg], "-image_width") || !strcmp(argv[iarg], "--w"))
-		{
-			if (iarg + 1 < argc)
-			{
-				int _int = convert_char<int>(argv[iarg + 1]);
-				this->image_width = _int;
-				iarg += 2;
-			}
-			else
-			{
-				std::cerr << "Invalid input arguments" << std::endl;
-			}
-		}
-		if (!strcmp(argv[iarg], "-samples_per_pixel") || !strcmp(argv[iarg], "--s"))
-		{
-			if (iarg + 1 < argc)
-			{
-				int _int = convert_char<int>(argv[iarg + 1]);
-				this->samples_per_pixel = _int;
-				iarg += 2;
-			}
-			else
-			{
-
-				std::cerr << "Invalid input arguments" << std::endl;
-			}
-		}
-		if (!strcmp(argv[iarg], "-max_depth") || !strcmp(argv[iarg], "--d"))
-		{
-			if (iarg + 1 < argc)
-			{
-				int _int = convert_char<int>(argv[iarg + 1]);
-				this->max_depth = _int;
-				iarg += 2;
-			}
-			else
-			{
-				std::cerr << "Invalid input arguments" << std::endl;
-			}
-		}
-		if (!strcmp(argv[iarg], "-vfov") || !strcmp(argv[iarg], "--v"))
-		{
-			if (iarg + 1 >= argc)
-				std::cerr << "Invalid input arguments" << std::endl;
-			int _int = convert_char<int>(argv[iarg + 1]);
-			this->vfov = _int;
-			iarg += 2;
-		}
-		if (!strcmp(argv[iarg], "-aspect_ratio") || !strcmp(argv[iarg], "--a"))
-		{
-			if (iarg + 2 >= argc)
-				std::cerr << "Invalid input arguments" << std::endl;
-			double _double = convert_char<double>(argv[iarg + 1]);
-			this->width_ratio = _double;
-			_double = convert_char<double>(argv[iarg + 2]);
-			this->height_ratio = _double;
-			iarg += 3;
-		}
-		if (!strcmp(argv[iarg], "-fps") || !strcmp(argv[iarg], "--f"))
-		{
-			if (iarg + 1 >= argc)
-				std::cerr << "Invalid input arguments" << std::endl;
-			int _int = convert_char<int>(argv[iarg + 1]);
-			this->fps = _int;
-			iarg += 2;
-		}
-		if (!strcmp(argv[iarg], "-num_seconds") || !strcmp(argv[iarg], "--t"))
-		{
-			if (iarg + 1 >= argc)
-				std::cerr << "Invalid input arguments" << std::endl;
-			int _int = convert_char<int>(argv[iarg + 1]);
-			this->num_seconds = _int;
-			iarg += 2;
-		}
-		else
-		{
-			std::cerr << "Unknown command line argument " << argv[iarg] << std::endl;
-		}
-	}
-
-
-	this->lookfrom = point3(13, 2, 3);
-	this->lookat = point3(0, 0, 0);
-	this->vup = point3(0, 1, 0);
-
-
-	this->defocus_angle = 0.6;
-	this->focus_dist = 10.0;
-
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) input_logger = true;
-	if (input_logger) input_logger_function(argc, argv);
+    // colors_array
+    c_array.reset_size(width_per_node, height_per_node);
+    /*if (rank == 0) {
+        std::clog << "An instance of the parallel class has been created" << std::endl;
+        fflush(stdout);
+    }*/
 }
 
-void input::input_logger_function(int argc, char** argv)
-{
-	logfile.open("RayTracingInput.log", std::ios::out);
-	if (!logfile.is_open())
-		std::cerr << "Cannot open the RayTracing.log file for logging" << std::endl;
-	else
-	{
-		logfile << "The input: " << std::endl;
-		for (int i = 0; i < argc; i++)
-			logfile << argv[i] << " ";
-		logfile << std::endl << "The parsed values: " << std::endl;
-
-		logfile << argv[0] << std::endl;
-		logfile << "image_width = " << this->image_width << std::endl;
-		logfile << "samples_per_pixel = " << this->samples_per_pixel << std::endl;
-		logfile << "max_depth = " << this->max_depth << std::endl;
-		logfile << "vfov = " << this->vfov << std::endl;
-		logfile << "aspect_ratio = " << this->width_ratio << "/" << this->height_ratio << std::endl;
-		logfile << "fps = " << this->fps << std::endl;
-		logfile << "num_seconds = " << this->num_seconds << std::endl;
-	}
-	logfile.close();
-
-	std::cout << std::endl;
-	std::cout << "Start making frames using with the following properties:" << std::endl;
-	std::cout << "image_width = " << this->image_width << std::endl;
-	std::cout << "samples_per_pixel = " << this->samples_per_pixel << std::endl;
-	std::cout << "max_depth = " << this->max_depth << std::endl;
-	std::cout << "vfov = " << this->vfov << std::endl;
-	std::cout << "aspect_ratio = " << this->width_ratio << "/" << this->height_ratio << std::endl;
-	std::cout << "fps = " << this->fps << std::endl;
-	std::cout << "num_seconds = " << this->num_seconds << std::endl;
-	std::cout << std::endl;
+color_array* const parallel::color_array_ptr() {
+    return &c_array;
 }
 
-void input::setup_camera(camera* cam) const
-{
-	cam->aspect_ratio = this->width_ratio / this->height_ratio;
-	cam->image_width = this->image_width;
-	cam->samples_per_pixel = this->samples_per_pixel;
-	cam->max_depth = this->max_depth;
-	//cam.vfov = 90;
-	cam->vfov = this->vfov;
-	cam->lookfrom = this->lookfrom;
-	cam->lookat = this->lookat;
-	cam->vup = this->vup;
-	cam->defocus_angle = this->defocus_angle;
-	cam->focus_dist = this->focus_dist;
-
-	cam->initialize();
+color_array* const parallel::color_array_all_ptr() {
+    return &c_array_all;
 }
 
-template<typename T>
-T input::convert_char(char* _chr)
-{
-	T _t(0);
-	std::string _string(_chr);
-	std::stringstream iss(_string);
+void parallel::render() {
+    cam->render(*world, c_array);
+}
 
-	if (_chr == nullptr)
-	{
-		throw std::invalid_argument("Null point passed to char_to_int");
-	}
+void parallel::gather() {
+    color_data* colors = c_array.return_array()[0];
+    color_data* colors_all = (color_data*)malloc(width_per_node * height_per_node * size * sizeof(color_data));
 
-	iss >> _t;
+    int num_double_data = width_per_node * height_per_node * sizeof(color_data) / sizeof(double);
 
-	// Check if the conversion was successful
-	if (iss.fail()) {
-		throw std::invalid_argument("Conversion failed in char_to_int");
-	}
 
-	return _t;
+    MPI_Allgather(colors, num_double_data, MPI_DOUBLE, colors_all, num_double_data, MPI_DOUBLE, MPI_world);
+    c_array_all = color_array(cam->image_width, cam->image_height, colors_all);
+    free(colors_all);
+    colors_all = nullptr;
+}
+
+int parallel::return_rank() const {
+    return rank;
 }
