@@ -14,7 +14,7 @@ export seconds=10
 echo "Creating individual frames"
 mpirun -np $NP $exe --w $width --s $samples_per_pixel --d $max_depth --v $vfov --a $aspect_width $aspect_height --f $fps --t $seconds
 echo "Merging the frames into a single movie"
-ffmpeg -framerate $fps - i *.ppm - c:v libx264 - b:v 1M - pix_fmt yuv420p RT15.mp4
+ffmpeg -framerate $fps -i *.ppm -c:v libx264 -b:v 1M -pix_fmt yuv420p RT15.mp4
 echo "Removing temporary files"
 rm -f *.ppm
 echo "All done!"
