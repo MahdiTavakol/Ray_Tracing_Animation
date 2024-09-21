@@ -1,6 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <fstream>
 #include "camera.h"
 
 class input
@@ -48,6 +49,10 @@ private:
 
 	int fps;
 	int num_seconds;
+
+	bool input_logger;
+	std::fstream logfile;
+	void input_logger_function(int argc, char **argv);
 };
 
 #endif
