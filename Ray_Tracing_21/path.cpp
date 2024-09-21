@@ -14,8 +14,9 @@ path::path(std::string _filename, int _num_seconds, int _fps): filename(_filenam
 
 path::path(point3& _center, double& _radius, int& _num_seconds, int& _fps, double& theta): num_seconds(_num_seconds), fps(_fps)
 {
+	double theta_radians = pi * theta / 180.0;
 	num_frames = num_seconds * fps;
-	double speed = theta / num_frames;
+	double speed = theta_radians / num_frames;
 
 	for (int i = 0; i < num_frames; i++)
 	{
