@@ -32,8 +32,7 @@ int main(int argc, char **argv)
 	MPI_Init(NULL, NULL);
 
 	// Parsing input arguments
-	//input in(argc, argv);
-	input in(NULL,NULL);
+	input in(argc, argv);
 
 
 	// World
