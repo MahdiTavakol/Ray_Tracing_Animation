@@ -1,16 +1,17 @@
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <iostream>
 #include "input.h"
 
 
-input::input(int argc, char ** argv):image_width(1920), samples_per_pixel(100), max_depth(50), 
+input::input(int argc, char** argv) :image_width(1920), samples_per_pixel(100), max_depth(50),
 vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 {
 	int iarg = 0;
 	while (iarg < argc)
 	{
-		if (!strcmp(argv[iarg],"-image_width") || !strcmp(argv[iarg], "--w"))
+		if (!strcmp(argv[iarg], "-image_width") || !strcmp(argv[iarg], "--w"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
@@ -18,7 +19,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 			this->image_width = _int;
 			iarg += 2;
 		}
-		if (!strcmp(argv[iarg],"-samples_per_pixel") || !strcmp(argv[iarg], "--s"))
+		if (!strcmp(argv[iarg], "-samples_per_pixel") || !strcmp(argv[iarg], "--s"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
@@ -26,7 +27,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 			this->samples_per_pixel = _int;
 			iarg += 2;
 		}
-		if (!strcmp(argv[iarg],"-max_depth") || !strcmp(argv[iarg], "--d"))
+		if (!strcmp(argv[iarg], "-max_depth") || !strcmp(argv[iarg], "--d"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
@@ -34,7 +35,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 			this->max_depth = _int;
 			iarg += 2;
 		}
-		if (!strcmp(argv[iarg],"-vfov") || !strcmp(argv[iarg], "--v"))
+		if (!strcmp(argv[iarg], "-vfov") || !strcmp(argv[iarg], "--v"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
@@ -42,7 +43,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 			this->max_depth = _int;
 			iarg += 2;
 		}
-		if (!strcmp(argv[iarg],"-aspect_ratio") || !strcmp(argv[iarg], "--a"))
+		if (!strcmp(argv[iarg], "-aspect_ratio") || !strcmp(argv[iarg], "--a"))
 		{
 			if (iarg + 2 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
@@ -52,7 +53,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 			this->height_ratio = _double;
 			iarg += 3;
 		}
-		if (!strcmp(argv[iarg],"-fps") || !strcmp(argv[iarg], "--f"))
+		if (!strcmp(argv[iarg], "-fps") || !strcmp(argv[iarg], "--f"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
@@ -60,7 +61,7 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 			this->fps = _int;
 			iarg += 1;
 		}
-		if (!strcmp(argv[iarg],"-num_seconds") || !strcmp(argv[iarg], "--t"))
+		if (!strcmp(argv[iarg], "-num_seconds") || !strcmp(argv[iarg], "--t"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
