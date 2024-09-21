@@ -8,39 +8,55 @@
 input::input(int argc, char** argv) :image_width(1920), samples_per_pixel(100), max_depth(50),
 vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 {
-	int iarg = 0;
+	int iarg = 1;
 	while (iarg < argc)
 	{
 		if (!strcmp(argv[iarg], "-image_width") || !strcmp(argv[iarg], "--w"))
 		{
-			if (iarg + 1 >= argc)
+			if (iarg + 1 < argc)
+			{
+				int _int = convert_char<int>(argv[iarg + 1]);
+				this->image_width = _int;
+				iarg += 2;
+			}
+			else
+			{
 				std::cerr << "Invalid input arguments" << std::endl;
-			int _int = convert_char<int>(argv[iarg + 1]);
-			this->image_width = _int;
-			iarg += 2;
+			}
 		}
 		if (!strcmp(argv[iarg], "-samples_per_pixel") || !strcmp(argv[iarg], "--s"))
 		{
-			if (iarg + 1 >= argc)
+			if (iarg + 1 < argc)
+			{
+				int _int = convert_char<int>(argv[iarg + 1]);
+				this->samples_per_pixel = _int;
+				iarg += 2;
+			}
+			else
+			{
+
 				std::cerr << "Invalid input arguments" << std::endl;
-			int _int = convert_char<int>(argv[iarg + 1]);
-			this->samples_per_pixel = _int;
-			iarg += 2;
+			}
 		}
 		if (!strcmp(argv[iarg], "-max_depth") || !strcmp(argv[iarg], "--d"))
 		{
-			if (iarg + 1 >= argc)
+			if (iarg + 1 < argc)
+			{
+				int _int = convert_char<int>(argv[iarg + 1]);
+				this->max_depth = _int;
+				iarg += 2;
+			}
+			else
+			{
 				std::cerr << "Invalid input arguments" << std::endl;
-			int _int = convert_char<int>(argv[iarg + 1]);
-			this->max_depth = _int;
-			iarg += 2;
+			}
 		}
 		if (!strcmp(argv[iarg], "-vfov") || !strcmp(argv[iarg], "--v"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
 			int _int = convert_char<int>(argv[iarg + 1]);
-			this->max_depth = _int;
+			this->vfov = _int;
 			iarg += 2;
 		}
 		if (!strcmp(argv[iarg], "-aspect_ratio") || !strcmp(argv[iarg], "--a"))
@@ -57,17 +73,21 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
-			double _int = convert_char<int>(argv[iarg + 1]);
+			int _int = convert_char<int>(argv[iarg + 1]);
 			this->fps = _int;
-			iarg += 1;
+			iarg += 2;
 		}
 		if (!strcmp(argv[iarg], "-num_seconds") || !strcmp(argv[iarg], "--t"))
 		{
 			if (iarg + 1 >= argc)
 				std::cerr << "Invalid input arguments" << std::endl;
-			double _int = convert_char<int>(argv[iarg + 1]);
+			int _int = convert_char<int>(argv[iarg + 1]);
 			this->fps = _int;
-			iarg += 1;
+			iarg += 2;
+		}
+		else
+		{
+			std::cerr << "Unknown command line argument " << argv[iarg] << std::endl;
 		}
 	}
 
