@@ -2,11 +2,13 @@
 #include <cstring>
 #include <sstream>
 #include <iostream>
+#include <mpi.h>
+
 #include "input.h"
 
 
 input::input(int argc, char** argv) :image_width(1920), samples_per_pixel(100), max_depth(50),
-vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
+vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10), input_logger(false)
 {
 	int iarg = 1;
 	while (iarg < argc)
@@ -99,6 +101,35 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(60), num_seconds(10)
 
 	this->defocus_angle = 0.6;
 	this->focus_dist = 10.0;
+
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	if (rank == 0) input_logger = true;
+	if (input_logger) input_logger_function(argc, argv);
+}
+
+void input::input_logger_function(int argc, char** argv)
+{
+	logfile.open("RayTracingInput.log");
+	if (!logfile.is_open())
+		std::cerr << "Cannot open the RayTracing.log file for logging" << std::endl;
+	else
+	{
+		logfile << "The input: " << std::endl;
+		for (int i = 0; i < argc; i++)
+			logfile << argv[i] << " ";
+		logfile << "The parsed values: " << std::endl;
+
+		logfile << argv[0] << std::endl;
+		logfile << "image_width = " << this->image_width << std::endl;
+		logfile << "samples_per_pixel = " << this->samples_per_pixel << std::endl;
+		logfile << "max_depth = " << this->max_depth << std::endl;
+		logfile << "vfov = " << this->vfov << std::endl;
+		logfile << "aspect_ratio = " << this->width_ratio << "/" << this->height_ratio << std::endl;
+		logfile << "fps = " << this->fps << std::endl;
+		logfile << "num_seconds = " << this->num_seconds << std::endl;
+	}
+	logfile.close();
 }
 
 void input::setup_camera(camera* cam) const
