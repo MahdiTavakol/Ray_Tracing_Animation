@@ -44,6 +44,8 @@ void parallel::gather() {
 
     MPI_Allgather(colors, num_double_data, MPI_DOUBLE, colors_all, num_double_data, MPI_DOUBLE, MPI_world);
     c_array_all = color_array(cam->image_width, cam->image_height, colors_all);
+    free(colors_all);
+    colors_all = nullptr;
 }
 
 int parallel::return_rank() const {
