@@ -131,7 +131,8 @@ void input::input_logger_function(int argc, char** argv)
 	}
 	logfile.close();
 
-	std::cout << "Start making a movie using with the following properties:" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Start making frames using with the following properties:" << std::endl;
 	std::cout << "image_width = " << this->image_width << std::endl;
 	std::cout << "samples_per_pixel = " << this->samples_per_pixel << std::endl;
 	std::cout << "max_depth = " << this->max_depth << std::endl;
@@ -139,6 +140,7 @@ void input::input_logger_function(int argc, char** argv)
 	std::cout << "aspect_ratio = " << this->width_ratio << "/" << this->height_ratio << std::endl;
 	std::cout << "fps = " << this->fps << std::endl;
 	std::cout << "num_seconds = " << this->num_seconds << std::endl;
+	std::cout << std::endl;
 }
 
 void input::setup_camera(camera* cam) const
