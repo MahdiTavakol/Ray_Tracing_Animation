@@ -32,6 +32,31 @@ __global__ void camera_gpu::initialize_camera()
 	defocus_disk_v = v * defocus_radius;
 }
 
+__global__ void camera_gpu::create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d)
+{
+	sphere_device* spheres;
+	hipMalloc((void**)&spheres, _n_spheres * sizeof(sphere_device));
+
+
+	// Creating each sphere on the device
+	for (int i = 0; i < _n_spheres; i++)
+	{
+		point3_device center(_sphere_centers_d[i][0], _sphere_centers_d[i][1], _sphere_centers_d[i][2]);
+		vec3_device dir(_sphere_centers_d[i][3], _sphere_centers_d[i][4], _sphere_centers_d[i][5]);
+		ray_device ry(center, dir);
+
+		/* with copy constructor
+		 * sphere_device sphere_i(ry, _sphere_radii_d[i]);
+		 * spheres[i] = sphere_i;
+		 */
+
+		// without copy constructor
+		new(&spheres[i]) sphere_device(ry, _sphere_radii_d[i]);
+	}
+
+	world_d = new hittable_list_device(spheres, _sphere_mat_type_d, _n_spheres);
+}
+
 __global__ void camera_gpu::render_stream(int _stream_number)
 {
 
@@ -56,7 +81,7 @@ __global__ void camera_gpu::render_stream(int _stream_number)
 	for (int sample = 0; sample < samples_per_pixel; sample++)
 	{
 		ray_device r = get_ray(i, j);
-		pixel_color += ray_color(r, max_depth, world);
+		pixel_color += ray_color(r, max_depth, world_d);
 	}
 
 	pixel_color = pixel_samples_scale * pixel_color;
@@ -93,32 +118,49 @@ __device__ point3_device camera_gpu::defocus_disk_sample() const
 	return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
 }
 
-__device__ color_device camera_gpu::ray_color(const ray_device& r, int depth, const hittable& world) const
+__device__ color_device camera_gpu::ray_color(const ray_device& _r, int depth, const hittable_list_device* world_d) const
 {
-	if (depth <= 0)
-		return color(0, 0, 0);
+	// Since GPUs have limited support for recursion, the recursion is converted to a loop
+	hit_record_device rec;
+	color product, sum_product;
 
-	hit_record rec;
+	ray_device scattered;
+	color_device attenuation;
+	color_device color_from_emission;
+	color_device output_color;
+	
 
-	if (!world.hit(r, interval(0.001, infinity), rec))
+	if (!world_d->hit(_r,interval_device(0.001,infinity), rec))
 		return background;
 
 
-	ray scattered;
-	color attenuation;
-	color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
-
-	if (!rec.mat->scatter(r, rec, attenuation, scattered))
-		return color_from_emission;
+	color_device* color_from_emission_array = new color_device[depth];
+	color_device* attenuation_array = new color_device[depth];
+	
+	ray_device scattered;
 
 
-	color color_from_scatter = attenuation * ray_color(scattered, depth - 1, world);
 
-	return color_from_emission + color_from_scatter;
+	for (int i = 0; i < depth; i++) {
+		
+		color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+		if (!rec.mat->scatter(r, rec, attenuation, scattered))
+			attenuation = color(0,0,0);
+
+		attenuation_array[i] = attenuation;
+		color_from_emission_array[i] = color_from_emission;
+	}
+
+	output_color = color_device(0,0,0);
+	
+	for (int i = 0; i < depth; i++)
+		output_color = output_color * attenuation_array[depth - 1 - i] + color_from_emission_array[depth - 1 - i];
+
+
+	delete[] color_from_emission_array;
+	delete[] attenuation_array;
+
 }
 
 
-__global__ void camera_gpu::hittable_list_H_to_D()
-{
-
-}

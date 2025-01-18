@@ -23,6 +23,9 @@ public:
 
     aabb bounding_box() const override { return bbox; }
 
+    void return_params(ray& _center, double& _radius, std::shared_ptr<material> _mat);
+
+
 private:
     ray center;
     double radius;

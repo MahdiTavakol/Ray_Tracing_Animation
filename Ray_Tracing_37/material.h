@@ -25,6 +25,12 @@ public:
 	{
 		return false;
 	}
+
+	virtual bool is_equal( const material& _second) const = 0;
+
+	bool operator==(const material& _second) {
+		return (typeid(*this) == typeid(_second)) && (is_equal(_second));
+	}
 };
 
 class general : public material
@@ -60,6 +66,13 @@ public:
 		return true;
 	}
 
+	bool is_equal(const material& _second) const override {
+		const general* o = dynamic_cast<const general*>(&_second);
+		return o && (albedo == o->albedo) && (shininess == o->shininess) &&
+			(d == o->d) && (Tr == o->Tr) && (Tf == o->Tf) && (Ks == o->Ks);
+	}
+
+
 
 private:
 	color albedo;
@@ -86,6 +99,13 @@ public:
 		attenuation = tex->value(rec.u, rec.v, rec.p);
 		return true;
 	}
+
+	bool is_equal(const material& _second) const override {
+		const lambertian* o = dynamic_cast<const lambertian*>(&_second);
+		return o && false;
+		//return o && (*tex == *(o->tex)); 
+	}
+
 private:
 	shared_ptr<texture> tex;
 };
@@ -103,6 +123,18 @@ public:
 		attenuation = albedo;
 		return true;
 	}
+
+	void return_params(color& _albedo, double& _fuzz)
+	{
+		_fuzz = fuzz;
+		_albedo = albedo;
+	}
+
+	bool is_equal(const material& _second) const override {
+		const metal* o = dynamic_cast<const metal*>(&_second);
+		return o && (albedo == o->albedo) && (fuzz == o->fuzz);
+	}
+
 private:
 	color albedo;
 	double fuzz;
@@ -134,6 +166,11 @@ public:
 		return true;
 	}
 
+	bool is_equal(const material& _second) const override {
+		const dielectric* o = dynamic_cast<const dielectric*>(&_second);
+		return o && (refraction_index == o->refraction_index);
+	}
+
 private:
 	double refraction_index;
 
@@ -155,6 +192,11 @@ public:
 		return tex->value(_u, _v, _p);
 	}
 
+	bool is_equal(const material& _second) const override {
+		const diffuse_light* o = dynamic_cast<const diffuse_light*>(&_second);
+		return o && (tex == o->tex);
+	}
+
 private:
 	shared_ptr<texture> tex;
 };
@@ -171,6 +213,12 @@ public:
 		_attenuation = tex->value(_rec.u, _rec.v, _rec.p);
 		return true;
 	}
+
+	bool is_equal(const material& _second) const override {
+		const isotropic* o = dynamic_cast<const isotropic*>(&_second);
+		return o && (tex == o->tex);
+	}
+
 private:
 	shared_ptr<texture> tex;
 };

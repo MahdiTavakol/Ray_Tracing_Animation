@@ -1,6 +1,8 @@
 #ifndef CAMERA_GPU_H
 #define CAMERA_GPU_H
 
+#include <unordered_set>
+
 #include "rtweekend.h"
 #include "rtweekend_gpu.h"
 
@@ -10,6 +12,9 @@
 #include "color_device.h"
 #include "hittable_list.h"
 #include "hittable_list_device.h"
+#include "material_list_device.h"
+#include "sphere.h"
+#include "material.h"
 #include "color_array.h"
 
 enum { DEVICE_TO_HOST, HOST_TO_DEVICE };
@@ -21,12 +26,7 @@ class camera_gpu
 	friend class input;
 	friend class parallel;
 public:
-	camera_gpu()
-	{
-		initialize_memory();
-		initialize_streams();
-		initialize_camera<<<1,1>>>();
-	}
+	camera_gpu(hittable_list* _world_h);
 
 	void render(color_array& c_a);
 
@@ -73,7 +73,19 @@ protected:
 	vec3_device defocus_disk_v;
 
 	// Initialize the memory
-	void initialize_memory();
+	void allocate_memory();
+
+	/*
+     * These two functions read the world_h (hittable_list) on the host and fill out
+     * the world_d (hittable_list_device) and materials on the device.
+     */
+	// Copies the world_h contents to the device
+	void initialize_device_memory();
+	// Fills the world_d based on the world_h contents
+	void fill_world_d();
+	void fill_material_d();
+
+	__global__ void create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d, int* _sphere_mat_id_d);
 	
 	// Initialize streams
 	void initialize_streams();
@@ -82,7 +94,7 @@ protected:
 	__device__ ray_device get_ray(int i, int j) const;
 	__device__ vec3_device sample_square() const;
 	__device__ point3_device defocus_disk_sample() const;
-	__device__ color ray_color(const ray_device& r, int depth, const hittable_list_device& world) const;
+	__device__ color ray_color(const ray_device& r, int depth, const hittable_list_device* world) const;
 	__global__ void initialize_camera();
 
 
@@ -111,13 +123,28 @@ protected:
 	 * For the copy the host reads each object in the world_h and creats the same
 	 * structure in the world_d instead of copying everything.
 	 */
-	hittable_list world_h;
-	hittable_list_device world_d;
+	hittable_list* world_h;
+	hittable_list_device* world_d;
 
-	/*
-	 * This function read the hittable_list on the host and fills out the hittable_list and materials on the device
-	 */
-	__global__ void hittable_list_H_to_D();
+	// Materials.. For now I used the host class on purpose so if it is possible or not
+	//material* materials_h;
+	//material* materials_d;
+
+	// Material_list on the device
+	material_list_device* material_d;
+
+	// Shape parameters on device and host
+	int n_spheres;
+	double** sphere_centers_h, * sphere_radii_h;
+	double** sphere_centers_d, * sphere_radii_d;
+	int* sphere_mat_type_d, * sphere_mat_type_h;
+	int* sphere_mat_id_d, * sphere_mat_id_h;
+
+	// Material parameters on device and host
+	int n_metals;
+	double** albedo_h, * fuzz_h;
+	double** albedo_d, * fuzz_d;
+
 
 	// The color array only in the host since deep copy is not supported;
 	color_array* c_array_h;

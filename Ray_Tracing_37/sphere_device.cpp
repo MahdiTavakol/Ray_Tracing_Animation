@@ -6,44 +6,41 @@ __device__ sphere_device::sphere_device(const point3_device& _center, double _ra
 __device__ sphere_device::sphere_device(const point3_device& _center1, const point3_device& _center2, double _radius)
     : center(_center1, _center2 - _center1), radius(std::fmax(0, _radius)) {}
 
+__device__ sphere_device::sphere_device(const ray_device& _center, double _radius)
+    : center(_center), radius(_radius) {}
+
 __device__ sphere_device::sphere_device(const sphere_device& _sphere)
     : center(_sphere.center), radius(_sphere.radius) {}
 
-__device__ void sphere_device::hit(ray_device& _ray, hit_record_device& _rec, bool& _hit) const 
+__device__ bool sphere_device::hit(const ray_device& r, interval_device ray_t, hit_record_device& rec) const
 {
-    point3_device current_center = center.at(_ray.time());
-    vec3_device oc = current_center - _ray.origin();
-    auto a = _ray.direction().length_squared();
-    auto h = dot(_ray.direction(), oc);
+    point3_device current_center = center.at(r.time());
+    vec3_device oc = current_center - r.origin();
+    auto a = r.direction().length_squared();
+    auto h = dot(r.direction(), oc);
     auto c = oc.length_squared() - radius * radius;
 
     auto discriminant = h * h - a * c;
     if (discriminant < 0)
-    {
-        _hit = false;
-        return;
-    }
+        return false;
 
     auto sqrtd = std::sqrt(discriminant);
 
     auto root = (h - sqrtd) / a;
-    if (!_ray.surrounds(root)) {
+    if (!ray_t.surrounds(root)) {
         root = (h + sqrtd) / a;
         if (!ray_t.surrounds(root))
-        {
-            _hit = false;
-            return;
-        }
+            return false;
     }
 
-    _rec.t = root;
-    _rec.p = _ray.at(_rec.t);
-    vec3_device outward_normal = (_rec.p - current_center) / radius;
-    _rec.set_face_normal(_ray, outward_normal);
-    get_sphere_uv(outward_normal, _rec.u, _rec.v);
+    rec.t = root;
+    rec.p = r.at(rec.t);
+    vec3_device outward_normal = (rec.p - current_center) / radius;
+    rec.set_face_normal(r, outward_normal);
+    get_sphere_uv(outward_normal, rec.u, rec.v);
+    rec.mat = mat;
 
-    _hit = true;
-    return;
+    return true;
 }
 
 __device__ void sphere_device::get_sphere_uv(const point3_device& p, double& u, double& v)

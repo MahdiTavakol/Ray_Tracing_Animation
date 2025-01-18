@@ -46,6 +46,13 @@ bool sphere::hit(const ray& r, interval ray_t, hit_record& rec) const {
     return true;
 }
 
+void sphere::return_params(ray& _center, double& _radius, std::shared_ptr<material> _mat)
+{
+    _center = this->center;
+    _radius = this->radius;
+    _mat = this->mat;
+}
+
 void sphere::get_sphere_uv(const point3& p, double& u, double& v)
 {
 
