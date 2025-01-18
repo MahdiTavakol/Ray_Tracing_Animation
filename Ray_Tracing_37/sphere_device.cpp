@@ -38,7 +38,11 @@ __device__ bool sphere_device::hit(const ray_device& r, interval_device ray_t, h
     vec3_device outward_normal = (rec.p - current_center) / radius;
     rec.set_face_normal(r, outward_normal);
     get_sphere_uv(outward_normal, rec.u, rec.v);
-    rec.mat = mat;
+
+
+    // The hit method on the hittable_list_device later on set the proper values for these two variables.
+    rec.mat_id = -1;
+    rec.mat_type = -1;
 
     return true;
 }

@@ -158,6 +158,10 @@ vfov(20), width_ratio(16.0), height_ratio(9.0), fps(1), num_seconds(1), input_lo
 		this->background = color(0.7, 0.8, 1.00);
 		// The rest of the thing
 	}
+	else if (mode == RANDOM_SPHERES_GPU)
+	{
+		setup_gpu_camera<<<1,1>>>();
+	}
 	else this->background = color(0.7, 0.8, 1.00);
 	
 

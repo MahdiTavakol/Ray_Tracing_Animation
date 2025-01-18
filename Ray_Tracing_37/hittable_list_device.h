@@ -11,9 +11,9 @@ class hittable_list_device
 {
 public:
 	__host__ __device__ hittable_list_device() {}
-	__host__ __device__ hittable_list_device(vec3_device* _centers, double* _radiuses, int* _mat_types, int _n_spheres);
-	__host__ __device__ hittable_list_device(ray_device* _centers, double* _radiuses, int* _mat_types, int _n_spheres);
-	__host__ __device__ hittable_list_device(sphere_device* _spheres, int* _mat_types, int _n_spheres);
+	__host__ __device__ hittable_list_device(vec3_device* _centers, double* _radiuses, int* _mat_types_spheres, int* _mat_ids_spheres, int _n_spheres);
+	__host__ __device__ hittable_list_device(ray_device* _centers, double* _radiuses, int* _mat_types_spheres, int* mat_ids_spheres, int _n_spheres);
+	__host__ __device__ hittable_list_device(sphere_device* _spheres, int* _mat_types_spheres, int* mat_ids_spheres, int _n_spheres);
 	__host__ __device__ ~hittable_list_device();
 
 	// To avoid branching I prefered to make the hit output void and material == -1 means the background
@@ -24,7 +24,8 @@ public:
 private:
 
 	sphere_device* spheres;
-	int* mat_types;
+	int* mat_types_spheres;
+	int* mat_ids_spheres;
 	int n_spheres;
 
 	__device__ bool hit_spheres(const ray_device& r, interval_device ray_t, hit_record_device& rec) const;

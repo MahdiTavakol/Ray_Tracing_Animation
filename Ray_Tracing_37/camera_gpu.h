@@ -16,6 +16,7 @@
 #include "sphere.h"
 #include "material.h"
 #include "color_array.h"
+#include "global_scope_device.h"
 
 enum { DEVICE_TO_HOST, HOST_TO_DEVICE };
 
@@ -27,50 +28,26 @@ class camera_gpu
 	friend class parallel;
 public:
 	camera_gpu(hittable_list* _world_h);
+	~camera_gpu();
 
 	void render(color_array& c_a);
 
 
-	__global__ __device__ virtual void move_camera(point3 _lookfrom) {
-		this->lookfrom = _lookfrom;
+	__device__ virtual void move_camera(point3_device _lookfrom) {
+		::lookfrom = _lookfrom;
 	}
+
 
 	__global__ __device__ void print_back_ground() const
 	{
 		std::cout << background << std::endl;
 	}
 
-	~camera_gpu();
+	
 
 
 protected:
 
-	// primary parameters set by the class input;
-	double aspect_ratio = 1.0;
-	int image_width = 100;
-	int image_height;
-	int samples_per_pixel = 10;
-	int max_depth = 10;
-	color_device background;
-	double vfov = 90;
-	point3_device lookfrom = point3_device(0, 0, 0);
-	point3_device lookat = point3_device(0, 0, -1);
-	vec3_device vup = vec3_device(0, 1, 0);
-	double defocus_angle = 0;
-	double focus_dist = 10;
-
-
-
-
-	// secondary parameters set by the initialize method
-	double pixel_samples_scale;
-	point3_device center;
-	point3_device pixel00_loc;
-	vec3_device pixel_delta_u;
-	vec3_device pixel_delta_v;
-	vec3_device u, v, w;
-	vec3_device defocus_disk_u;
-	vec3_device defocus_disk_v;
 
 	// Initialize the memory
 	void allocate_memory();
@@ -84,8 +61,11 @@ protected:
 	// Fills the world_d based on the world_h contents
 	void fill_world_d();
 	void fill_material_d();
+	// Deallocates the world_d
+	__global__ void destroy_world_d();
 
 	__global__ void create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d, int* _sphere_mat_id_d);
+	__global__ void create_metals_on_device(int _n_metals, double** _albedo_d, double* _fuzz_d);
 	
 	// Initialize streams
 	void initialize_streams();

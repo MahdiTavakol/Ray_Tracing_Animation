@@ -25,6 +25,8 @@ public:
 		attenuation = albedo;
 		return true;
 	}
+
+
 protected:
 	color_device albedo;
 	double fuzz;

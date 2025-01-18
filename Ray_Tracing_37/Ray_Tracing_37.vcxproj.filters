@@ -27,9 +27,6 @@
     <ClInclude Include="camera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="camera_derived.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="camera_gpu.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -141,6 +138,21 @@
     <ClInclude Include="color_device.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="interval_device.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="material_list_device.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="material_device.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_derived.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="global_scope_device.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aabb.cpp">
@@ -237,6 +249,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="write.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="interval_device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracing_21.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="input_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

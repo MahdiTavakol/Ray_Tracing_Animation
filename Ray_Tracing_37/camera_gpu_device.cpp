@@ -32,10 +32,10 @@ __global__ void camera_gpu::initialize_camera()
 	defocus_disk_v = v * defocus_radius;
 }
 
-__global__ void camera_gpu::create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d)
+__global__ void camera_gpu::create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d, int* _sphere_mat_id_d)
 {
 	sphere_device* spheres;
-	hipMalloc((void**)&spheres, _n_spheres * sizeof(sphere_device));
+	HIP_CHECK(hipMalloc((void**)&spheres, _n_spheres * sizeof(sphere_device)));
 
 
 	// Creating each sphere on the device
@@ -54,7 +54,19 @@ __global__ void camera_gpu::create_spheres_on_device(int _n_spheres, double** _s
 		new(&spheres[i]) sphere_device(ry, _sphere_radii_d[i]);
 	}
 
-	world_d = new hittable_list_device(spheres, _sphere_mat_type_d, _n_spheres);
+	new(world_d) hittable_list_device(spheres, _sphere_mat_type_d, _sphere_mat_id_d, _n_spheres);
+}
+
+__global__ void camera_gpu::create_metals_on_device(int _n_metals, double** _albedo_d, double* _fuzz_d)
+{
+	new(material_d) material_list_device(_n_metals, _albedo_d, _fuzz_d);
+
+}
+
+__global__ void camera_gpu::destroy_world_d()
+{
+	world_d->~hittable_list_device();
+	HIP_CHECK(hipFree(world_d));
 }
 
 __global__ void camera_gpu::render_stream(int _stream_number)
@@ -142,10 +154,14 @@ __device__ color_device camera_gpu::ray_color(const ray_device& _r, int depth, c
 
 
 	for (int i = 0; i < depth; i++) {
-		
-		color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
 
-		if (!rec.mat->scatter(r, rec, attenuation, scattered))
+		if (rec.mat_type != 0) std::cerr << "Unsupported material" << std::endl;
+
+		const metal_device&  mat = (*material_d)(rec.mat_type, rec.mat_id);
+		
+		color_from_emission = mat.emitted(rec.u, rec.v, rec.p);
+
+		if (mat.scatter(_r,rec,attenuation,scattered))
 			attenuation = color(0,0,0);
 
 		attenuation_array[i] = attenuation;

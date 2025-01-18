@@ -17,6 +17,7 @@ public:
     __device__ vec3_device(double _e0, double _e1, double _e2) : e{ _e0, _e1, _e2 } {}
     __device__ vec3_device(const vec3_device& _vc) : vec3_device(_vc[0], _vc[1], _vc[2]) {}
 
+
     __device__ double x() const { return e[0]; }
     __device__ double y() const { return e[1]; }
     __device__ double z() const { return e[2]; }

@@ -18,6 +18,9 @@ public:
     double w;
     bool front_face;
 
+    int mat_type;
+    int mat_id;
+
     void set_face_normal(const ray_device& r, const vec3_device& outward_normal);
 };
 

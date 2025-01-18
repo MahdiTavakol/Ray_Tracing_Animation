@@ -22,6 +22,8 @@ camera_gpu::~camera_gpu()
 
 	hipHostFree(c_data_h);
 	hipFree(c_data_d);
+	hipFree(world_d);
+	hipFree(material_d);
 }
 
 
@@ -79,28 +81,42 @@ void camera_gpu::allocate_memory()
 
 void camera_gpu::initialize_device_memory()
 {
-	double** sphere_centers_h, * sphere_radii_h;
-	double** sphere_centers_d, * sphere_radii_d;
-	int* sphere_mat_type_d, * sphere_mat_type_h;
-	double** albedo_h, * fuzz_h;
-	double** albedo_d, * fuzz_d;
-	int n_spheres = 0;
-	int n_materials = 0;
+	n_spheres = 0;
+	n_metals = 0;
 
-	std::unordered_set<std::shared_ptr<material>> unique_materials;
+	std::vector<sphere> spheres;
+	std::vector<int> sphere_mat_types;
+	std::vector<int> sphere_mat_ids;
+	std::vector<metal> metals;
+
+	// Leave it for now!
+	std::unordered_set<std::shared_ptr<metal>> unique_metals;
+
+	std::vector<std::vector<int>> material_mapping; // std::vector<[material_type,material_id]>
 
 	// Counting the number of spheres and unique materials
-	for (auto& object: world_h->objects)
+	for (auto& object : world_h->objects)
 	{
-		if (std::shared_ptr<sphere> sphere_i =  std::dynamic_pointer_cast<sphere>(object))
+		if (std::shared_ptr<sphere> sphere_i = std::dynamic_pointer_cast<sphere>(object))
 		{
 			ray _ray;
 			double _radius;
 			std::shared_ptr<material> _mat;
 			sphere_i->return_params(_ray, _radius, _mat);
+			sphere* sphere_i_raw = sphere_i.get();
+			spheres.push_back(*sphere_i_raw);
 			n_spheres++;
 
-			unique_materials.insert(_mat);
+			if (std::shared_ptr<metal> metal_i = std::dynamic_pointer_cast<metal>(_mat))
+			{
+				metal* metal_i_raw = metal_i.get();
+				metals.push_back(*metal_i_raw);
+				sphere_mat_types.push_back(0); //metal
+				sphere_mat_ids.push_back(n_metals); //metal kind
+				n_metals++;
+			}
+			else
+				std::cerr << "Unsupported material" << std::endl;
 		}
 		else
 		{
@@ -108,68 +124,100 @@ void camera_gpu::initialize_device_memory()
 		}
 	}
 
-	n_materials = unique_materials.size();
+	n_metals = unique_metals.size();
 
 	hipMallocHost((void**)&sphere_centers_h, n_spheres * 6 * sizeof(double));
 	hipMallocHost((void**)&sphere_radii_h, n_spheres * sizeof(double));
 	hipMallocHost((void**)&sphere_mat_type_h, n_spheres * sizeof(int));
-	hipMallocHost((void**)&albedo_h,3* n_materials * sizeof(double));
-	hipMallocHost((void**)&fuzz_h, n_materials * sizeof(double));
+	hipMallocHost((void**)&sphere_mat_id_h, n_spheres * sizeof(int));
+	hipMallocHost((void**)&albedo_h, 3 * n_metals * sizeof(double));
+	hipMallocHost((void**)&fuzz_h, n_metals * sizeof(double));
 	hipMalloc((void**)&sphere_centers_d, n_spheres * 6 * sizeof(double));
 	hipMalloc((void**)&sphere_radii_d, n_spheres * sizeof(double));
 	hipMalloc((void**)&sphere_mat_type_d, n_spheres * sizeof(int));
-	hipMalloc((void**)&albedo_d,3* n_materials * sizeof(double));
-	hipMalloc((void**)&fuzz_d, n_materials * sizeof(double));
-
-	for (auto it = unique_materials.begin(); it != unique_materials.end(); ++it) {
-		color albedo;
-		double fuzz;
-		std::shared_ptr<material> test = *it;
-		metal* s = dynamic_cast<metal>(test);
-		test->return_params(albedo, fuzz);
-	}
-
-	for (int i = 0; i < n_materials; i++)
-	{
-		color albedo;
-		double fuzz;
-		unique_materials[i]->return_params(albedo, fuzz);
-	}
+	hipMalloc((void**)&sphere_mat_id_d, n_spheres * sizeof(int));
+	hipMalloc((void**)&albedo_d, 3 * n_metals * sizeof(double));
+	hipMalloc((void**)&fuzz_d, n_metals * sizeof(double));
 
 
 	int counter = 0;
-	for (auto& object : world_h->objects)
+	for (sphere& sphere_i : spheres)
 	{
-		if (std::shared_ptr<sphere> sphere_i = std::dynamic_pointer_cast<sphere>(object)) {
-			ray _ray;
-			double _radius;
-			point3 _center;
-			vec3 _dir;
-			std::shared_ptr<material> _mat;
-			sphere_i->return_params(_ray, _radius, _mat);
-			_center = _ray.origin();
-			_dir = _ray.direction();
-			sphere_centers_h[counter][0] = _center.x();
-			sphere_centers_h[counter][1] = _center.y();
-			sphere_centers_h[counter][2] = _center.z();
-			sphere_centers_h[counter][3] = _dir.x();
-			sphere_centers_h[counter][4] = _dir.y();
-			sphere_centers_h[counter][5] = _dir.z();
-			sphere_radii_h[counter] = _radius;
-			sphere_mat_type_h[counter] = 0;
-			counter++;
-		}
+		ray _ray;
+		double _radius;
+		point3 _center;
+		vec3 _dir;
+		std::shared_ptr<material> _mat;
+		sphere_i.return_params(_ray, _radius, _mat);
+		_center = _ray.origin();
+		_dir = _ray.direction();
+		sphere_centers_h[counter][0] = _center.x();
+		sphere_centers_h[counter][1] = _center.y();
+		sphere_centers_h[counter][2] = _center.z();
+		sphere_centers_h[counter][3] = _dir.x();
+		sphere_centers_h[counter][4] = _dir.y();
+		sphere_centers_h[counter][5] = _dir.z();
+		sphere_radii_h[counter] = _radius;
+		sphere_mat_type_h[counter] = sphere_mat_types[counter];
+		sphere_mat_id_h[counter] = sphere_mat_ids[counter];
+		counter++;
 	}
+
+	int counter = 0;
+
+	for (metal& metal_i : metals)
+	{
+		color _albedo;
+		double _fuzz;
+		metal_i.return_params(_albedo, _fuzz);
+		for (int j = 0; j < 3; j++)
+			albedo_h[counter][j] = _albedo[j];
+		fuzz_h[counter] = _fuzz;
+	}
+
+
+	// copying the data into the device
+
 
 	HIP_CHECK(hipMemcpy(sphere_centers_d, sphere_centers_h, 6 * n_spheres * sizeof(double), hipMemcpyHostToDevice));
 	HIP_CHECK(hipMemcpy(sphere_radii_d, sphere_radii_h, n_spheres * sizeof(double), hipMemcpyHostToDevice));
 	HIP_CHECK(hipMemcpy(sphere_mat_type_d, sphere_mat_type_h, n_spheres * sizeof(int), hipMemcpyHostToDevice));
+	HIP_CHECK(hipMemcpy(sphere_mat_id_d, sphere_mat_id_h, n_spheres * sizeof(int), hipMemcpyHostToDevice));
+	HIP_CHECK(hipMemcpy(albedo_d, albedo_h, 3 * n_metals * sizeof(double), hipMemcpyHostToDevice));
+	HIP_CHECK(hipMemcpy(fuzz_d, fuzz_h, n_metals * sizeof(double), hipMemcpyHostToDevice));
 
+
+	// deallocating the host memory after the copying is finished
+	HIP_CHECK(hipHostFree(sphere_centers_h));
+	HIP_CHECK(hipHostFree(sphere_radii_h));
+	HIP_CHECK(hipHostFree(sphere_mat_type_h));
+	HIP_CHECK(hipHostFree(sphere_mat_id_h));
+	HIP_CHECK(hipHostFree(albedo_h));
+	HIP_CHECK(hipHostFree(fuzz_h));
 }
+
 
 void camera_gpu::fill_world_d()
 {
-	create_spheres_on_device<<<1,1>>>();
+	HIP_CHECK(hipMalloc((void**)&world_d, sizeof(hittable_list_device)));
+
+
+	// Building spheres on device
+	create_spheres_on_device<<<1, 1>>>(n_spheres, sphere_centers_d, sphere_radii_d, sphere_mat_type_d, sphere_mat_id_d);
+
+	// deallocating the device memory
+	HIP_CHECK(hipFree(sphere_centers_d));
+	HIP_CHECK(hipFree(sphere_radii_d));
+	HIP_CHECK(hipFree(sphere_mat_type_d));
+	HIP_CHECK(hipFree(sphere_mat_id_d));
+}
+
+void camera_gpu::fill_material_d()
+{
+	HIP_CHECK(hipMalloc((void**)&material_d, sizeof(material_list_device)));
+	create_metals_on_device<<<1,1>>>(n_metals,albedo_d,fuzz_d);
+	HIP_CHECK(hipFree(albedo_d));
+	HIP_CHECK(hipFree(fuzz_d));
 }
 
 void camera_gpu::initialize_streams()
