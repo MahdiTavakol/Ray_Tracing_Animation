@@ -69,6 +69,12 @@ __global__ void camera_gpu::destroy_world_d()
 	HIP_CHECK(hipFree(world_d));
 }
 
+__global__ void camera_gpu::destroy_material_d()
+{
+	material_d->~material_list_device();
+	HIP_CHECK(hipFree(material_d));
+}
+
 __global__ void camera_gpu::render_stream(int _stream_number)
 {
 

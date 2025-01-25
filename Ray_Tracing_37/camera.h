@@ -21,6 +21,8 @@ class camera {
 public:
 	friend class input;
 	friend class parallel;
+	friend class parallel_camera;
+	friend class parallel_derived;
 
 	camera() {
 		initialize();

@@ -4,21 +4,21 @@
 renderer::renderer(int argc, char** argv, int _mode, std::string _filename)
 	: mode(_mode), filename(_filename), c_array(nullptr), c_array_all(nullptr),
  	  world(nullptr), world_parallel(nullptr),
-	  cam(nullptr),cam_derived(nullptr), pth(nullptr)
+	  cam(nullptr), pth(nullptr)
 {
 	in = new input(argc, argv, mode);
 
 	switch (mode)
 	{
 		case OBJ_MODEL_PARALLEL:
-			cam_derived = new camera_derived(in);
-			world_parallel = new hittable_list_parallel();
-			para = new parallel(world_parallel, cam_derived);
+			cam = new camera_derived(in);
+			world = new hittable_list_parallel();
+			para = new parallel_derived(world, cam);
 			break;
 		default:
 			cam = new camera_parallel(in);
 			world = new hittable_list();
-			para = new parallel(world, cam);
+			para = new parallel_camera(world, cam);
 			break;
 	}
 
@@ -33,9 +33,7 @@ renderer::~renderer()
 {
 	delete in;
 	if (cam) delete cam;
-	if (cam_derived) delete cam_derived;
 	if (world) delete world;
-	if (world_parallel) delete world_parallel;
 	if (para) delete para;
 	if (writer) delete writer;
 	if (pth) delete pth;
@@ -91,6 +89,9 @@ void renderer::setup()
 		case RANDOM_SPHERES_ANIMATED:
 			setup_random_spheres_animated();
 			break;
+		case RANDOM_SPHERES_GPU:
+			setup_random_spheres_gpu();
+			break;
 	}
 
 	para->setup();
@@ -120,10 +121,7 @@ void renderer::write_file()
 {
 	int image_width, image_height;
 
-	if (cam)
-		cam->return_image_size(image_width, image_height);
-	else if (cam_derived)
-		cam_derived->return_image_size(image_width, image_height);
+	cam->return_image_size(image_width, image_height);
 	writer->reset(c_array_all, image_width, image_height);
 
 	int rank = para->return_rank();
@@ -136,8 +134,6 @@ parallel* renderer::para_ptr() const {
 
 camera* renderer::cam_ptr() const
 {
-	if (mode == OBJ_MODEL_PARALLEL)
-		return cam_derived;
 	return cam;
 }
 
@@ -152,10 +148,7 @@ int renderer::return_num_frames() const
 void renderer::move_camera(const int frame_i)
 {
 	// moving the camera
-	if (cam)
-		cam->move_camera((*pth)[frame_i]);
-	if (cam_derived)
-		cam_derived->move_camera((*pth)[frame_i]);
+	cam->move_camera((*pth)[frame_i]);
 }
 
 void renderer::next_file(const int frame_i)
@@ -389,4 +382,29 @@ void renderer::setup_random_spheres_animated()
 	// Creating a new path variable containing the camera locations
 	*pth = path(center, radius, num_seconds, fps, theta);
 
+}
+
+void renderer::setup_random_spheres_gpu()
+{
+
+	for (int a = -11; a < 11; a++)
+		for (int b = -11; b < 11; b++)
+		{
+			point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+
+			if ((center - point3(4, 0.2, 0)).length() > 0.9) {
+				shared_ptr<material> sphere_material;
+				auto albedo = color::random(0.5, 1);
+				auto fuzz = random_double(0, 0.5);
+				sphere_material = make_shared<metal>(albedo, fuzz);
+				world->add(make_shared<sphere>(center, 0.2, sphere_material));
+
+			}
+
+		}
+
+	auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+	world->add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+
+	*world = hittable_list(make_shared<bvh_node>(*world));
 }

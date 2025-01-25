@@ -22,8 +22,10 @@ camera_gpu::~camera_gpu()
 
 	hipHostFree(c_data_h);
 	hipFree(c_data_d);
-	hipFree(world_d);
-	hipFree(material_d);
+	
+
+	destroy_world_d();
+	destroy_material_d();
 }
 
 
@@ -205,19 +207,41 @@ void camera_gpu::fill_world_d()
 	// Building spheres on device
 	create_spheres_on_device<<<1, 1>>>(n_spheres, sphere_centers_d, sphere_radii_d, sphere_mat_type_d, sphere_mat_id_d);
 
-	// deallocating the device memory
+	// deallocating the spheres memory on the device
 	HIP_CHECK(hipFree(sphere_centers_d));
 	HIP_CHECK(hipFree(sphere_radii_d));
 	HIP_CHECK(hipFree(sphere_mat_type_d));
 	HIP_CHECK(hipFree(sphere_mat_id_d));
+
+
+	/*
+	 * Building planes on the device
+	 * .........
+	 * .......
+	 * .....
+	 * ...
+	 * .
+	 */
 }
 
 void camera_gpu::fill_material_d()
 {
 	HIP_CHECK(hipMalloc((void**)&material_d, sizeof(material_list_device)));
+
+	// Creating metals on the device
 	create_metals_on_device<<<1,1>>>(n_metals,albedo_d,fuzz_d);
+
+	// deallocating the metal variables on device
 	HIP_CHECK(hipFree(albedo_d));
 	HIP_CHECK(hipFree(fuzz_d));
+
+	/*
+	 * Building lambertian material on device
+	 * ............
+	 * ........
+	 * ....
+	 * 
+	 */
 }
 
 void camera_gpu::initialize_streams()

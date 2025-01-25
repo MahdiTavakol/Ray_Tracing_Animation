@@ -63,6 +63,8 @@ protected:
 	void fill_material_d();
 	// Deallocates the world_d
 	__global__ void destroy_world_d();
+	// Deallocates the material_d
+	__global__ void destroy_material_d();
 
 	__global__ void create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d, int* _sphere_mat_id_d);
 	__global__ void create_metals_on_device(int _n_metals, double** _albedo_d, double* _fuzz_d);

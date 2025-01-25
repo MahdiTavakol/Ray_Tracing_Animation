@@ -30,7 +30,8 @@ int main(int argc, char** argv)
 	//mode = CORNELL_SMOKE;
 	//mode = OBJ_MODEL;
 	//mode = OBJ_MODEL_PARALLEL;
-	mode = RANDOM_SPHERES_ANIMATED;
+	//mode = RANDOM_SPHERES_ANIMATED;
+	mode = RANDOM_SPHERES_GPU;
 
 	//filename = "RT18.ppm";
 	//filename = "RT19.ppm";
@@ -46,7 +47,8 @@ int main(int argc, char** argv)
 	//filename = "RT29.ppm";
 	//filename = "RT30.ppm";
 	//filename = "RT31.ppm";
-	filename = "RT32.ppm";
+	//filename = "RT32.ppm";
+	filename = "RT33.ppm";
 
 	renderer* render = new renderer(argc, argv, mode, filename);
 

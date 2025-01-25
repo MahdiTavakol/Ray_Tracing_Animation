@@ -153,6 +153,12 @@
     <ClInclude Include="global_scope_device.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="parallel_camera.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel_derived.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aabb.cpp">
@@ -258,6 +264,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="input_device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel_camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel_derived.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

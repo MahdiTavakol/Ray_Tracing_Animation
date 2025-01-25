@@ -20,6 +20,8 @@
 #include "material.h"
 #include "path.h"
 #include "parallel.h"
+#include "parallel_camera.h"
+#include "parallel_derived.h"
 #include "quad.h"
 #include "ray.h"
 #include "rtw_stb_image.h"
@@ -50,11 +52,9 @@ public:
 private:
 	int mode;
 	std::string filename;
-	camera_derived* cam_derived;
-	camera_parallel* cam;
+	camera* cam;
 	input* in;
 	hittable_list* world;
-	hittable_list_parallel* world_parallel;
 	parallel* para;
 	color_array* c_array, * c_array_all;
 	write* writer;
@@ -76,6 +76,7 @@ private:
 	void setup_3d_obj();
 	void setup_3d_obj_parallel();
 	void setup_random_spheres_animated();
+	void setup_random_spheres_gpu();
 
 };
 
