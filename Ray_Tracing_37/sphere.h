@@ -25,6 +25,8 @@ public:
 
     void return_params(ray& _center, double& _radius, std::shared_ptr<material> _mat);
 
+    void return_material(std::shared_ptr<material>& _mat) override;
+
 
 private:
     ray center;

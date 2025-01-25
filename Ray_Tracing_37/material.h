@@ -166,6 +166,11 @@ public:
 		return true;
 	}
 
+	void return_params(double& _ref)
+	{
+		_ref = refraction_index;
+	}
+
 	bool is_equal(const material& _second) const override {
 		const dielectric* o = dynamic_cast<const dielectric*>(&_second);
 		return o && (refraction_index == o->refraction_index);

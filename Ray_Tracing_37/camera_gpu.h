@@ -6,7 +6,7 @@
 #include "rtweekend.h"
 #include "rtweekend_gpu.h"
 
-
+#include "quad.h"
 #include "ray_device.h"
 #include "vec3_device.h"
 #include "color_device.h"
@@ -66,8 +66,10 @@ protected:
 	// Deallocates the material_d
 	__global__ void destroy_material_d();
 
-	__global__ void create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d, int* _sphere_mat_id_d);
-	__global__ void create_metals_on_device(int _n_metals, double** _albedo_d, double* _fuzz_d);
+	// Filling the world_d with different shapes
+	__global__ void fill_world_d_on_device();
+	// Filling materials_d with different materials
+	__global__ void fill_material_d_on_device();
 	
 	// Initialize streams
 	void initialize_streams();
@@ -115,17 +117,42 @@ protected:
 	// Material_list on the device
 	material_list_device* material_d;
 
-	// Shape parameters on device and host
+	// objects on device and host
+
+	
+
+	// spheres
 	int n_spheres;
 	double** sphere_centers_h, * sphere_radii_h;
 	double** sphere_centers_d, * sphere_radii_d;
-	int* sphere_mat_type_d, * sphere_mat_type_h;
-	int* sphere_mat_id_d, * sphere_mat_id_h;
+	int* sphere_id_h, * sphere_id_d;
+
+
+	// quads
+	int n_quads;
+	double** Qs_h, ** us_h, ** vs_h;
+	double** Qs_d, ** us_d, ** vs_d;
+	int* quad_id_h, * quad_id_d;
+
 
 	// Material parameters on device and host
-	int n_metals;
+	int n_objects;
+	int* object_id_h, * material_type_h, * material_id_h;
+	int* object_id_d, * material_type_d, * material_id_d;
+
+
+	int* object_id_h, * mat_type_h, * mat_id_h;
+	int* object_id_d, * mat_type_d, * mat_id_d;
+
+
+	int n_metals, n_dielectrics, n_lambertians;
+
+	// metals
 	double** albedo_h, * fuzz_h;
 	double** albedo_d, * fuzz_d;
+	// dielectrics
+	double* ref_index_h;
+	double* ref_index_d;
 
 
 	// The color array only in the host since deep copy is not supported;

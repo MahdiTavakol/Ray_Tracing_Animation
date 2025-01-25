@@ -8,7 +8,7 @@ __global__ void camera_gpu::initialize_camera()
 
 	center = lookfrom;
 
-	auto theta = degrees_to_radians(vfov);
+	auto theta = degrees_to_radians_device(vfov);
 	auto h = std::tan(theta / 2.0);
 	auto viewport_height = 2 * h * focus_dist;
 	auto viewport_width = viewport_height * (double(image_width) / image_height);
@@ -32,17 +32,21 @@ __global__ void camera_gpu::initialize_camera()
 	defocus_disk_v = v * defocus_radius;
 }
 
-__global__ void camera_gpu::create_spheres_on_device(int _n_spheres, double** _sphere_centers_d, double* _sphere_radii_d, int* _sphere_mat_type_d, int* _sphere_mat_id_d)
+__global__ void camera_gpu::fill_world_d_on_device()
 {
+	new(world_d) hittable_list_device();
+
+	//  Creating spheres
+
 	sphere_device* spheres;
-	HIP_CHECK(hipMalloc((void**)&spheres, _n_spheres * sizeof(sphere_device)));
+	HIP_CHECK(hipMalloc((void**)&spheres, n_spheres * sizeof(sphere_device)));
 
 
 	// Creating each sphere on the device
-	for (int i = 0; i < _n_spheres; i++)
+	for (int i = 0; i < n_spheres; i++)
 	{
-		point3_device center(_sphere_centers_d[i][0], _sphere_centers_d[i][1], _sphere_centers_d[i][2]);
-		vec3_device dir(_sphere_centers_d[i][3], _sphere_centers_d[i][4], _sphere_centers_d[i][5]);
+		point3_device center(sphere_centers_d[i][0], sphere_centers_d[i][1], sphere_centers_d[i][2]);
+		vec3_device dir(sphere_centers_d[i][3], sphere_centers_d[i][4], sphere_centers_d[i][5]);
 		ray_device ry(center, dir);
 
 		/* with copy constructor
@@ -51,15 +55,22 @@ __global__ void camera_gpu::create_spheres_on_device(int _n_spheres, double** _s
 		 */
 
 		// without copy constructor
-		new(&spheres[i]) sphere_device(ry, _sphere_radii_d[i]);
+		new(&spheres[i]) sphere_device(ry, sphere_radii_d[i]);
 	}
 
-	new(world_d) hittable_list_device(spheres, _sphere_mat_type_d, _sphere_mat_id_d, _n_spheres);
+	world_d->add_spheres(spheres, sphere_mat_type_d, sphere_mat_id_d, n_spheres);
+	// Creating other shapes
+
+
+
+	
 }
 
-__global__ void camera_gpu::create_metals_on_device(int _n_metals, double** _albedo_d, double* _fuzz_d)
+__global__ void camera_gpu::fill_material_d_on_device()
 {
-	new(material_d) material_list_device(_n_metals, _albedo_d, _fuzz_d);
+	new(material_d) material_list_device();
+
+
 
 }
 

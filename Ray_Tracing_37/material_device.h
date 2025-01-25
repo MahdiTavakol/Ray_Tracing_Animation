@@ -6,6 +6,8 @@
 #include "hit_record_device.h"
 #include "ray_device.h"
 #include "vec3_device.h"
+#include "texture_device.h"
+
 
 class metal_device
 {
@@ -75,6 +77,33 @@ protected:
 		r0 = r0 * r0;
 		return r0 + (1 - r0) * std::pow((1 - cosine), 5);
 	}
+};
+
+class lambertian_device
+{
+public:
+	lambertian_device(const color_device& _albedo) : tex(make_shared<solid_color>(_albedo)) {}
+	lambertian_device(shared_ptr<texture_device> _tex) : tex(_tex) {}
+
+	color_device emitted(double _u, double _v, const point3_device& _p) const
+	{
+		return color_device(0, 0, 0);
+	}
+
+	bool scatter(const ray_device& r_in, const hit_record_device& rec, color_device& attenuation, ray_device& scattered) const
+	{
+		auto scatter_direction = rec.normal + random_unit_vector();
+
+		if (scatter_direction.near_zero())
+			scatter_direction = rec.normal;
+		scattered = ray_device(rec.p, scatter_direction, r_in.time());
+		attenuation = tex->value(rec.u, rec.v, rec.p);
+		return true;
+	}
+
+
+private:
+	shared_ptr<texture_device> tex;
 };
 
 

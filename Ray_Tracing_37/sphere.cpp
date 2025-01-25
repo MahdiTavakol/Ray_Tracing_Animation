@@ -53,6 +53,11 @@ void sphere::return_params(ray& _center, double& _radius, std::shared_ptr<materi
     _mat = this->mat;
 }
 
+void sphere::return_material(std::shared_ptr<material>& _mat)
+{
+    _mat = mat;
+}
+
 void sphere::get_sphere_uv(const point3& p, double& u, double& v)
 {
 

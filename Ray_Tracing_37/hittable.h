@@ -31,6 +31,7 @@ public:
     virtual ~hittable() = default;
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
     virtual aabb bounding_box() const = 0;
+    virtual void return_material(std::shared_ptr<material>& _mat) {};
 };
 
 class translate : public hittable

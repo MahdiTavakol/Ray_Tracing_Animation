@@ -55,3 +55,16 @@ bool quad::is_interior(double _a, double _b, hit_record& _rec) const {
 	_rec.v = _b;
 	return true;
 }
+
+void quad::return_material(std::shared_ptr<material>& _mat)
+{
+	_mat = mat;
+}
+
+void quad::return_params(point3& _Q, vec3& _u, vec3& _v, shared_ptr<material> _mat)
+{
+	_Q = Q;
+	_u = u;
+	_v = v;
+	_mat = mat;
+}

@@ -31,4 +31,29 @@ __device__ vec3_device u, v, w;
 __device__ vec3_device defocus_disk_u;
 __device__ vec3_device defocus_disk_v;
 
+
+
+__device__ const double infinity_device = std::numeric_limits<double>::infinity();
+__device__ const double pi_device = 3.1415926535897932385;
+
+__device__ inline double degrees_to_radians_device(double degree)
+{
+	return degree * pi / 180.0;
+}
+
+__device__ inline double random_double_device()
+{
+	return std::rand() / (RAND_MAX + 1.0);
+}
+
+__device__ inline double random_double_device(double min, double max)
+{
+	return min + (max - min) * random_double_device();
+}
+
+__device__ inline int random_int_device(int min, int max)
+{
+	return int(random_double_device(min, max + 1));
+}
+
 #endif
