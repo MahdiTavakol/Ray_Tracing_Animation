@@ -56,10 +56,13 @@ private:
 	camera* cam;
 	input* in;
 	hittable_list* world;
+	hittable_list_gpu_openmp* world_gpu_openmp;
 	parallel* para;
 	color_array* c_array, * c_array_all;
 	write* writer;
 	path* pth;
+
+	int flags;
 	
 
 

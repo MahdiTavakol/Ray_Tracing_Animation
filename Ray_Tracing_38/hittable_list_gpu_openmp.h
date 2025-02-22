@@ -23,14 +23,20 @@ public:
 	~hittable_list_gpu_openmp();
 	void initialize();
 	void clear();
-	virtual void add(shared_ptr<hittable> object);
+	virtual void add(shared_ptr<hittable> object)
+	{
+		objects.push_back(object);
+		bbox = aabb(bbox, object->bounding_box());
+	}
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
 	bool hit(const ray& r, interval ray_t, int _mat_info[2]) const;
 	aabb bounding_box() const override { return bbox; }
 
 
 protected:
+
 	aabb bbox;
+
 	/* First we put everything into the objects array to know
 	 * The number of each of spheres, quads, etc. then we allocate
 	 * the arrays and deallocate the objects vector.

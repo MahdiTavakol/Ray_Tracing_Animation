@@ -6,6 +6,12 @@ parallel::parallel(hittable_list* _world, camera* _cam):
     parallel_initialize();
 }
 
+parallel::parallel(hittable_list_gpu_openmp* _world, camera* _cam) :
+    world_gpu_openmp(_world), cam(_cam)
+{
+    std::cerr << "You should never have reacher here" << std::endl;
+}
+
 
 void parallel::parallel_initialize()
 {

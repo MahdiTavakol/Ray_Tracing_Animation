@@ -7,6 +7,7 @@ class parallel_derived : public parallel
 {
 public:
 	parallel_derived(hittable_list* _world, camera* _cam);
+	parallel_derived(hittable_list_gpu_openmp* _world, camera* _cam);
 	void setup() override;
 	void render() override;
 	void gather() override;

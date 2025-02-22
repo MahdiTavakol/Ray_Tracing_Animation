@@ -16,7 +16,9 @@
 class parallel
 {
 public:
+    parallel() {}
     parallel(hittable_list* _world, camera* _cam);
+    parallel(hittable_list_gpu_openmp* _world, camera* _cam);
     void parallel_initialize();
     void MPI_initialize();
     virtual void setup();
@@ -31,6 +33,7 @@ public:
 protected:
     camera* cam;
     hittable_list* world;
+    hittable_list_gpu_openmp* world_gpu_openmp;
 
 
     int size, rank;

@@ -3,10 +3,12 @@
 
 renderer::renderer(int argc, char** argv, int _mode, std::string _filename)
 	: mode(_mode), filename(_filename), c_array(nullptr), c_array_all(nullptr),
- 	  world(nullptr),
+ 	  world(nullptr),world_gpu_openmp(nullptr),
 	  cam(nullptr), pth(nullptr)
 {
 	in = new input(argc, argv, mode);
+
+	flags = 0;
 
 	switch (mode)
 	{
@@ -17,8 +19,9 @@ renderer::renderer(int argc, char** argv, int _mode, std::string _filename)
 			break;
 		case RANDOM_SPHERES_GPU_OPENMP:
 			cam = new camera_gpu_openmp(in);
-			world = new hittable_list_gpu_openmp();
-			para = new parallel_derived(world, cam);
+			world_gpu_openmp = new hittable_list_gpu_openmp();
+			para = new parallel_derived(world_gpu_openmp, cam);
+			flags |= GPU_OPENMP;
 			break;
 		default:
 			cam = new camera_parallel(in);
@@ -106,7 +109,10 @@ void renderer::setup()
 
 void renderer::add(shared_ptr<hittable> object)
 {
-	world->add(object);
+	if (!(flags & GPU_OPENMP))
+		world->add(object);
+	else if (flags & GPU_OPENMP)
+		world_gpu_openmp->add(object);
 }
 
 void renderer::render()
@@ -402,14 +408,14 @@ void renderer::setup_random_spheres_gpu_openmp()
 				auto albedo = color::random(0.5, 1);
 				auto fuzz = random_double(0, 0.5);
 				sphere_material = make_shared<metal>(albedo, fuzz);
-				world->add(make_shared<sphere>(center, 0.2, sphere_material));
+				world_gpu_openmp->add(make_shared<sphere>(center, 0.2, sphere_material));
 
 			}
 
 		}
 
 	auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-	world->add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+	world_gpu_openmp->add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-	*world = hittable_list(make_shared<bvh_node>(*world));
+	*world_gpu_openmp = hittable_list_gpu_openmp(make_shared<bvh_node>(*world));
 }
