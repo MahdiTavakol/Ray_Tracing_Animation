@@ -9,6 +9,15 @@ parallel_derived::parallel_derived(hittable_list* _world, camera* _cam)
 	if (!world_type_test) std::cerr << "Wrong world type" << std::endl;
 }
 
+parallel_derived::parallel_derived(hittable_list_gpu_openmp* _world, camera* _cam)
+{
+	camera_derived* cam_type_test = dynamic_cast<camera_derived*>(_cam);
+	hittable_list_gpu_openmp* world_type_test = dynamic_cast<hittable_list_gpu_openmp*>(_world);
+
+	if (!cam_type_test) std::cerr << "Wrong camera type" << std::endl;
+	if (!world_type_test) std::cerr << "Wrong world type" << std::endl;
+}
+
 void parallel_derived::setup()
 {
 	c_array_all.reset_size(cam->image_width, cam->image_height);
