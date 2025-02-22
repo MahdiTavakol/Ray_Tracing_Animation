@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "camera_derived.h"
 #include "camera_parallel.h"
+#include "camera_gpu_openmp.h"
 #include "color.h"
 #include "color_array.h"
 #include "constant_medium.h"
@@ -76,7 +77,7 @@ private:
 	void setup_3d_obj();
 	void setup_3d_obj_parallel();
 	void setup_random_spheres_animated();
-	void setup_random_spheres_gpu();
+	void setup_random_spheres_gpu_openmp();
 
 };
 

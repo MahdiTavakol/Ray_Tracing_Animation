@@ -10,9 +10,12 @@ public:
 	virtual void set_bounding_box();
 	aabb bounding_box() const override { return bbox; }
 	bool hit(const ray& _r, interval _ray_t, hit_record& _rec) const override;
+	bool hit(const ray& _r, interval _ray_t, hit_record_gpu_openmp& _rec) const override;
+	// Since virtual is not allowed with template functions I had to have two similar definitions of is_interior.
 	virtual bool is_interior(double _a, double _b, hit_record& _rec) const;
+	virtual bool is_interior(double _a, double _b, hit_record_gpu_openmp& rec) const;
 	void return_material(std::shared_ptr<material>& _mat) override;
-	void return_params(point3& _Q, vec3& _u, vec3& _v, shared_ptr<material> _mat);
+	void return_params(point3& _Q, vec3& _u, vec3& _v, shared_ptr<material> _mat) const;
 
 protected:
 	point3 Q;
@@ -24,27 +27,5 @@ protected:
 	double D;
 };
 
-inline shared_ptr<hittable_list> box(const point3& _a, const point3& _b, shared_ptr<material> _mat)
-{
-
-	shared_ptr<hittable_list> sides = make_shared<hittable_list>();
-
-	point3 min = point3(std::fmin(_a.x(), _b.x()), std::fmin(_a.y(), _b.y()), std::fmin(_a.z(), _b.z()));
-	point3 max = point3(std::fmax(_a.x(), _b.x()), std::fmax(_a.y(), _b.y()), std::fmax(_a.z(), _b.z()));
-
-	vec3 dx = vec3(max.x() - min.x(), 0, 0);
-	vec3 dy = vec3(0, max.y() - min.y(), 0);
-	vec3 dz = vec3(0, 0, max.z() - min.z());
-
-	sides->add(make_shared<quad>(point3(min.x(), min.y(), max.z()), dx, dy, _mat));
-	sides->add(make_shared<quad>(point3(max.x(), min.y(), max.z()), -dz, dy, _mat));
-	sides->add(make_shared<quad>(point3(max.x(), min.y(), min.z()), -dx, dy, _mat));
-    sides->add(make_shared<quad>(point3(min.x(), min.y(), min.z()),  dz, dy, _mat));
-	sides->add(make_shared<quad>(point3(min.x(), max.y(), max.z()), dx, -dz, _mat));
-	sides->add(make_shared<quad>(point3(min.x(), min.y(), min.z()), dx, dz, _mat));
-
-	return sides;
-
-}
 
 #endif

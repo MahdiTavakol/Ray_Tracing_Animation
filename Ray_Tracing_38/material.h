@@ -113,6 +113,8 @@ private:
 class metal : public material
 {
 public:
+	metal() : albedo(vec3(0, 0, 0)), fuzz(1.0) {}
+
 	metal(const color& _albedo, double _fuzz) : albedo(_albedo), fuzz(_fuzz) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override

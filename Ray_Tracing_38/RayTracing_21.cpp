@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	//mode = OBJ_MODEL;
 	//mode = OBJ_MODEL_PARALLEL;
 	//mode = RANDOM_SPHERES_ANIMATED;
-	mode = RANDOM_SPHERES_GPU;
+	mode = RANDOM_SPHERES_GPU_OPENMP;
 
 	//filename = "RT18.ppm";
 	//filename = "RT19.ppm";

@@ -21,7 +21,7 @@ void parallel_derived::render()
 
 void parallel_derived::gather()
 {
-	std::cerr << "The gather method should in the parallel class should be implemented for a non-parallel camera object" << std::endl;
+	std::cerr << "The gather method in the parallel class should be implemented for a non-parallel camera object" << std::endl;
 }
 
 color_array* const parallel_derived::color_array_ptr()

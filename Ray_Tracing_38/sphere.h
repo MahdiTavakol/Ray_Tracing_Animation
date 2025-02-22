@@ -21,6 +21,8 @@ public:
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
 
+    bool hit(const ray& r, interval ray_t, hit_record_gpu_openmp& rec) const override;
+
     aabb bounding_box() const override { return bbox; }
 
     void return_params(ray& _center, double& _radius, std::shared_ptr<material> _mat) const;

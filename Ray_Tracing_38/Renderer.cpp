@@ -3,7 +3,7 @@
 
 renderer::renderer(int argc, char** argv, int _mode, std::string _filename)
 	: mode(_mode), filename(_filename), c_array(nullptr), c_array_all(nullptr),
- 	  world(nullptr), world_parallel(nullptr),
+ 	  world(nullptr),
 	  cam(nullptr), pth(nullptr)
 {
 	in = new input(argc, argv, mode);
@@ -13,6 +13,11 @@ renderer::renderer(int argc, char** argv, int _mode, std::string _filename)
 		case OBJ_MODEL_PARALLEL:
 			cam = new camera_derived(in);
 			world = new hittable_list_parallel();
+			para = new parallel_derived(world, cam);
+			break;
+		case RANDOM_SPHERES_GPU_OPENMP:
+			cam = new camera_gpu_openmp(in);
+			world = new hittable_list_gpu_openmp();
 			para = new parallel_derived(world, cam);
 			break;
 		default:
@@ -89,8 +94,8 @@ void renderer::setup()
 		case RANDOM_SPHERES_ANIMATED:
 			setup_random_spheres_animated();
 			break;
-		case RANDOM_SPHERES_GPU:
-			setup_random_spheres_gpu();
+		case RANDOM_SPHERES_GPU_OPENMP:
+			setup_random_spheres_gpu_openmp();
 			break;
 	}
 
@@ -384,7 +389,7 @@ void renderer::setup_random_spheres_animated()
 
 }
 
-void renderer::setup_random_spheres_gpu()
+void renderer::setup_random_spheres_gpu_openmp()
 {
 
 	for (int a = -11; a < 11; a++)

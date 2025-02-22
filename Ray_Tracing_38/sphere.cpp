@@ -46,6 +46,35 @@ bool sphere::hit(const ray& r, interval ray_t, hit_record& rec) const {
     return true;
 }
 
+bool sphere::hit(const ray& r, interval ray_t, hit_record_gpu_openmp& rec) const {
+    point3 current_center = center.at(r.time());
+    vec3 oc = current_center - r.origin();
+    auto a = r.direction().length_squared();
+    auto h = dot(r.direction(), oc);
+    auto c = oc.length_squared() - radius * radius;
+
+    auto discriminant = h * h - a * c;
+    if (discriminant < 0)
+        return false;
+
+    auto sqrtd = std::sqrt(discriminant);
+
+    auto root = (h - sqrtd) / a;
+    if (!ray_t.surrounds(root)) {
+        root = (h + sqrtd) / a;
+        if (!ray_t.surrounds(root))
+            return false;
+    }
+
+    rec.t = root;
+    rec.p = r.at(rec.t);
+    vec3 outward_normal = (rec.p - current_center) / radius;
+    rec.set_face_normal(r, outward_normal);
+    get_sphere_uv(outward_normal, rec.u, rec.v);
+
+    return true;
+}
+
 void sphere::return_params(ray& _center, double& _radius, std::shared_ptr<material> _mat) const
 {
     _center = this->center;

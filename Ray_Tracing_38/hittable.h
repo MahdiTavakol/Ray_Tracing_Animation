@@ -4,6 +4,7 @@
 #include "rtweekend.h"
 #include "aabb.h"
 #include "interval.h"
+#include "hittable_list_gpu_openmp.h"
 #include "ray.h"
 #include "vec3.h"
 #include <memory>

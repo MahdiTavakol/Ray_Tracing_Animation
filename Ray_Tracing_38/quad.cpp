@@ -45,6 +45,32 @@ bool quad::hit(const ray& _r, interval _ray_t, hit_record& _rec) const
 	return true;
 }
 
+bool quad::hit(const ray& _r, interval _ray_t, hit_record_gpu_openmp& _rec) const
+{
+	auto denom = dot(normal, _r.direction());
+
+	if (std::fabs(denom) < 1e-8)
+		return false;
+
+	auto t = (D - dot(normal, _r.origin())) / denom;
+	if (!_ray_t.contains(t))
+		return false;
+
+	auto intersection = _r.at(t);
+	vec3 planar_hitpt_vector = intersection - Q;
+	auto alpha = dot(w, cross(planar_hitpt_vector, v));
+	auto beta = dot(w, cross(u, planar_hitpt_vector));
+
+	if (!is_interior(alpha, beta, _rec))
+		return false;
+
+	_rec.t = t;
+	_rec.p = intersection;
+	_rec.set_face_normal(_r, normal);
+
+	return true;
+}
+
 bool quad::is_interior(double _a, double _b, hit_record& _rec) const {
 	interval unit_interval = interval(0, 1);
 
@@ -56,12 +82,24 @@ bool quad::is_interior(double _a, double _b, hit_record& _rec) const {
 	return true;
 }
 
+bool quad::is_interior(double _a, double _b, hit_record_gpu_openmp& _rec) const {
+	interval unit_interval = interval(0, 1);
+
+	if (!unit_interval.contains(_a) || !unit_interval.contains(_b))
+		return false;
+
+	_rec.u = _a;
+	_rec.v = _b;
+	return true;
+
+}
+
 void quad::return_material(std::shared_ptr<material>& _mat)
 {
 	_mat = mat;
 }
 
-void quad::return_params(point3& _Q, vec3& _u, vec3& _v, shared_ptr<material> _mat)
+void quad::return_params(point3& _Q, vec3& _u, vec3& _v, shared_ptr<material> _mat) const
 {
 	_Q = Q;
 	_u = u;
