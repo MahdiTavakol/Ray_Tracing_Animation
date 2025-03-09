@@ -1,10 +1,9 @@
-#pragma once
 #ifndef HIT_RECORD_GPU_OPENMP_H
 #define HIT_RECORD_GPU_OPENMP_H
 
 #include "rtweekend.h"
 #include "vec3.h"
-#include "material.h"
+#include "hittable.h"
 
 class hit_record_gpu_openmp
 {

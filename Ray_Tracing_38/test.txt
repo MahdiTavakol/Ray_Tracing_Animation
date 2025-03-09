@@ -1,0 +1,9 @@
+salloc --nodes=1 --exclusive --time=04:00:00 --partition=gpu --qos=gpu-exc --account=e05-biosoft-Tan --gpus=1
+
+module load PrgEnv-amd
+module load rocm
+module load craype-accel-amd-gfx90a
+module load craype-x86-milan
+
+amdclang++ -std=c++17 -O3 -fopenmp -fopenmp-targets=amdgcn-amd-amdhsa   -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx90a:xnack-   aabb.cpp color_array.cpp bvh.cpp camera.cpp camera_gpu_openmp.cpp   camera_parallel.cpp color.cpp constant_medium.cpp hit_record_gpu_openmp.cpp   hit_record_simple.cpp hittable.cpp hittable_list.cpp hittable_list_gpu_openmp.cpp   hittable_list_parallel.cpp   input.cpp input_device.cpp interval.cpp mesh.cpp obj_model_reader.cpp   obj_model_reader_parallel.cpp parallel.cpp parallel_camera.cpp   parallel_derived.cpp path.cpp perlin.cpp planes.cpp planes_gpu_openmp.cpp   quad.cpp quad_gpu_openmp.cpp RayTracing_21.cpp Renderer.cpp   rtw_stb_image.cpp sphere.cpp sphere_gpu_openmp.cpp sphere_list.cpp   triangle_mesh.cpp vec3.cpp write.cpp   -o my_program -lamdhip64
+

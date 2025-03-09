@@ -1,17 +1,13 @@
 #include "camera_gpu_openmp.h"
 
-camera_gpu_openmp::camera_gpu_openmp() :
+camera_gpu_openmp::camera_gpu_openmp(const input* _in) :
 	camera()
 {
-	// Grid Dim
-	TX = 8;
-	TY = 8;
-
-	// Block Dim
-	NX = image_width / TX;
-	NY = image_height / TY;
-
+	_in->setup_camera(this);
 }
+
+camera_gpu_openmp::camera_gpu_openmp() :
+	camera() {}
 
 void camera_gpu_openmp::render(const hittable& world, color_array& c_a)
 {
@@ -31,20 +27,22 @@ void camera_gpu_openmp::render(const hittable& world, color_array& c_a)
 		int i = tx + team_x * NX;
 		int j = ty + team_y * NY;
 
-		if (i > image_width || j > image_height) return;
-
-
-		color pixel_color(0, 0, 0);
-		for (int sample = 0; sample < samples_per_pixel; sample++)
+		if (i >= 0 && i < image_width && j >= 0 && j < image_height)
 		{
-			ray r = get_ray(i, j);
-			pixel_color += ray_color(r, max_depth, world);
+			color pixel_color(0, 0, 0);
+
+			for (int sample = 0; sample < samples_per_pixel; sample++)
+			{
+				ray r = get_ray(i, j);
+				pixel_color += ray_color(r, max_depth, world);
+			}
+			pixel_color = pixel_samples_scale * pixel_color;
+			color_data** c_data = c_a.return_array();
+			c_data[i][j].r = pixel_color.x();
+			c_data[i][j].g = pixel_color.y();
+			c_data[i][j].b = pixel_color.z();
 		}
-		pixel_color = pixel_samples_scale * pixel_color;
-		color_data** c_data = c_a.return_array();
-		c_data[i][j].r = pixel_color.x();
-		c_data[i][j].g = pixel_color.y();
-		c_data[i][j].b = pixel_color.z();
+
 	}
 }
 
@@ -60,22 +58,20 @@ color camera_gpu_openmp::ray_color(const ray& _r, int depth, const hittable& wor
 	hit_record rec;
 	color product, sum_product;
 
-	ray scattered;
+	ray   scattered;
 	color attenuation;
 	color color_from_emission;
 	color output_color;
 
 	int temp_mat_info[2] = { 0,0 };
 
-	if (!world_gpu_openmp->hit(_r, interval(0.001, infinity),  temp_mat_info))
+	if (!world_gpu_openmp->hit(_r, interval(0.001, infinity), temp_mat_info))
 		return background;
-	
 
 
-	color* color_from_emission_array = new color[depth];
-	color* attenuation_array = new color[depth];
+	std::unique_ptr<color[]> color_from_emission_array = std::make_unique<color[]>(depth);
+	std::unique_ptr<color[]> attenuation_array = std::make_unique<color[]>(depth);
 
-	ray scattered;
 
 	int material_type = temp_mat_info[0];
 	int material_id = temp_mat_info[1];
@@ -104,13 +100,10 @@ color camera_gpu_openmp::ray_color(const ray& _r, int depth, const hittable& wor
 		attenuation_array[i] = attenuation;
 		color_from_emission_array[i] = color_from_emission;
 	}
-		
+
 	for (int i = 0; i < depth; i++)
 		output_color = output_color * attenuation_array[depth - 1 - i] + color_from_emission_array[depth - 1 - i];
 
-
-	delete[] color_from_emission_array;
-	delete[] attenuation_array;
 
 }
 #pragma omp end declare target

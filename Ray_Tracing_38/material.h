@@ -9,7 +9,7 @@
 #include "texture.h"
 #include "hittable.h"
 
-//class hit_record;
+
 
 class material
 {
@@ -229,6 +229,5 @@ public:
 private:
 	shared_ptr<texture> tex;
 };
-
 
 #endif

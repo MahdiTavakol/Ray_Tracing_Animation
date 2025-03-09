@@ -1,15 +1,18 @@
 #ifndef CAMERA_GPU_OPENMP
 #define CAMERA_GPU_OPENMP
 
+#include <omp.h>
+
 #include "camera.h"
+#include "input.h"
+#include "hittable_list_gpu_openmp.h"
 
 class camera_gpu_openmp : public camera
 {
 public:
-	camera_gpu_openmp(const input* _in)
-	{
-		_in->setup_camera(this);
-	}
+	camera_gpu_openmp(const input* _in);
+	camera_gpu_openmp();
+
 
 	void render(const hittable& world, color_array& c_a);
 

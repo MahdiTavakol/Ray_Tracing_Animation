@@ -137,6 +137,7 @@
     <ClCompile Include="aabb.cpp" />
     <ClCompile Include="bvh.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="camera_gpu_openmp.cpp" />
     <ClCompile Include="camera_parallel.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="color_array.cpp" />
@@ -145,6 +146,7 @@
     <ClCompile Include="hittable_list.cpp" />
     <ClCompile Include="hittable_list_gpu_openmp.cpp" />
     <ClCompile Include="hittable_list_parallel.cpp" />
+    <ClCompile Include="hit_record_gpu_openmp.cpp" />
     <ClCompile Include="hit_record_simple.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="input_device.cpp" />
@@ -158,13 +160,15 @@
     <ClCompile Include="path.cpp" />
     <ClCompile Include="perlin.cpp" />
     <ClCompile Include="planes.cpp" />
+    <ClCompile Include="planes_gpu_openmp.cpp" />
     <ClCompile Include="quad.cpp" />
+    <ClCompile Include="quad_gpu_openmp.cpp" />
     <ClCompile Include="RayTracing_21.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="rtw_stb_image.cpp" />
     <ClCompile Include="sphere.cpp" />
     <ClCompile Include="sphere_list.cpp" />
-    <ClCompile Include="sphere_simple.cpp" />
+    <ClCompile Include="sphere_gpu_openmp.cpp" />
     <ClCompile Include="triangle_mesh.cpp" />
     <ClCompile Include="vec3.cpp" />
     <ClCompile Include="write.cpp" />
@@ -174,6 +178,7 @@
     <ClInclude Include="bvh.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="camera_derived.h" />
+    <ClInclude Include="camera_gpu_openmp.h" />
     <ClInclude Include="camera_parallel.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="color_array.h" />
@@ -183,6 +188,7 @@
     <ClInclude Include="hittable_list_gpu_openmp.h" />
     <ClInclude Include="hittable_list_parallel.h" />
     <ClInclude Include="hittable_list_parallel_optimized.h" />
+    <ClInclude Include="hit_record_gpu_openmp.h" />
     <ClInclude Include="hit_record_simple.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="interval.h" />
@@ -196,8 +202,10 @@
     <ClInclude Include="path.h" />
     <ClInclude Include="perlin.h" />
     <ClInclude Include="planes.h" />
+    <ClInclude Include="planes_gpu_openmp.h" />
     <ClInclude Include="point3_animated.h" />
     <ClInclude Include="quad.h" />
+    <ClInclude Include="quad_gpu_openmp.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="rtweekend.h" />
@@ -205,7 +213,7 @@
     <ClInclude Include="rtw_stb_image.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="sphere_list.h" />
-    <ClInclude Include="sphere_simple.h" />
+    <ClInclude Include="sphere_gpu_openmp.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="triangle_mesh.h" />
     <ClInclude Include="vec3.h" />

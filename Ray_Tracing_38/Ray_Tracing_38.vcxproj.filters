@@ -108,13 +108,25 @@
     <ClCompile Include="hittable_list_gpu_openmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sphere_simple.cpp">
+    <ClCompile Include="sphere_gpu_openmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hit_record_simple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sphere_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hit_record_gpu_openmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="quad_gpu_openmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="planes_gpu_openmp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_gpu_openmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -230,13 +242,25 @@
     <ClInclude Include="hittable_list_gpu_openmp.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="sphere_simple.h">
+    <ClInclude Include="sphere_gpu_openmp.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="hit_record_simple.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="sphere_list.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hit_record_gpu_openmp.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quad_gpu_openmp.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="planes_gpu_openmp.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_gpu_openmp.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

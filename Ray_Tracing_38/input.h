@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include "camera.h"
-#include "rtweekend_gpu.h"
 
 
 class input
@@ -35,7 +34,6 @@ public:
 		_num_seconds = this->num_seconds;
 	}
 	void setup_camera(camera* cam) const;
-	__global__ void setup_gpu_camera();
 
 protected:
 	template<typename T>

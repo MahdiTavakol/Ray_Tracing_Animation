@@ -13,11 +13,6 @@ sphere_gpu_openmp::sphere_gpu_openmp(const sphere& _shape, const int& _mat_id):
     this->radius = _radius;
 }
 
-bool sphere_gpu_openmp::hit(const ray& r, interval ray_t, hit_record& red) const {
-    std::cerr << "The sphere_simple class is made specifically for "
-        << "the use with gpu " << std::endl << " Please use the sphere class instead" << std::endl;
-}
-
 bool sphere_gpu_openmp::hit(const ray& r, interval ray_t, hit_record_gpu_openmp& rec) const {
     point3 current_center = center.at(r.time());
     vec3 oc = current_center - r.origin();

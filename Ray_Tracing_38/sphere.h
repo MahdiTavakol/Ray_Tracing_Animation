@@ -21,7 +21,7 @@ public:
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
 
-    bool hit(const ray& r, interval ray_t, hit_record_gpu_openmp& rec) const override;
+    bool hit(const ray& r, interval ray_t, hit_record_gpu_openmp& rec) const;
 
     aabb bounding_box() const override { return bbox; }
 

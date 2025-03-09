@@ -8,8 +8,12 @@
 #include "hit_record_gpu_openmp.h"
 #include "interval.h"
 #include "sphere.h"
+#include "sphere_gpu_openmp.h"
 #include "quad.h"
+#include "quad_gpu_openmp.h"
 #include "planes.h"
+#include "planes_gpu_openmp.h"
+#include "material.h"
 
 #include <vector>
 
@@ -57,16 +61,19 @@ protected:
 
 	int nspheres;
 	int* sphere_ids;
-	sphere* spheres;
+	sphere_gpu_openmp* spheres;
+	
 	int nquads;
 	int* quad_ids;
-	quad* quads;
+	quad_gpu_openmp* quads;
+	
 	int ntriangles;
 	int* triangle_ids;
-	triangle* triangles;
+	triangle_gpu_openmp* triangles;
+	
 	int* circle_ids;
 	int ncircles;
-	circle* circles;
+	circle_gpu_openmp* circles;
 	// <----- This part should have its own class
 
 
@@ -76,8 +83,10 @@ protected:
 
 	int nmetals;
 	metal* metals;
+	
 	int nlambertians;
 	lambertian* lambertians;
+	
 	int ndielectrics;
 	dielectric* dielectrics;
 	// <----- This part should have its own class

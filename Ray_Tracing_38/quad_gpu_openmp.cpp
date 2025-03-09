@@ -19,13 +19,6 @@ void quad_gpu_openmp::initialize()
 	set_bounding_box();
 }
 
-void quad_gpu_openmp::set_bounding_box()
-{
-	auto bbox_diagonal1 = aabb(Q, Q + u + v);
-	auto bbox_diagonal2 = aabb(Q + u, Q + v);
-	bbox = aabb(bbox_diagonal1, bbox_diagonal2);
-}
-
 bool quad_gpu_openmp::hit(const ray& _r, interval _ray_t, hit_record& _rec) const
 {
 	std::cerr << "For CPU usage please use the quad class instead " << std::endl;

@@ -22,13 +22,13 @@ hittable_list_gpu_openmp::~hittable_list_gpu_openmp()
 void hittable_list_gpu_openmp::clear()
 {
 	while(nspheres)
-		spheres[--nspheres].~sphere();
+		spheres[--nspheres].~sphere_gpu_openmp();
 
 	while (nquads)
-		quads[--nquads].~quad();
+		quads[--nquads].~quad_gpu_openmp();
 
 	while (ncircles)
-		circles[--ncircles].~circle();
+		circles[--ncircles].~circle_gpu_openmp();
 
 	free(spheres);
 	free(quads);
@@ -41,7 +41,7 @@ void hittable_list_gpu_openmp::clear()
 	while (ndielectrics)
 		dielectrics[--ndielectrics].~dielectric();
 
-#pragma omp target exit data map(delete: shape_mat_info[0:nshapes][0:2])
+#pragma omp target exit data map(delete: shapes_mat_info[0:nshapes][0:2])
 #pragma omp target exit data map(delete: spheres[0:nspheres])
 #pragma omp target exit data map(delete: sphere_ids[0:nspheres])
 #pragma omp target exit data map(delete: quads[0:nquads])
@@ -58,6 +58,7 @@ void hittable_list_gpu_openmp::clear()
 void hittable_list_gpu_openmp::initialize()
 {
 	std::vector<int[2]> shapes_mat_info_temp;
+	
 	std::vector<sphere> spheres_temp;
 	std::vector<int> sphere_ids_temp;
 	std::vector<quad> quads_temp;
@@ -153,9 +154,10 @@ void hittable_list_gpu_openmp::initialize()
 
 
 
-	spheres = (sphere*)malloc(nspheres * sizeof(sphere));
-	quads = (quad*)malloc(nquads * sizeof(quad));
-	circles = (circle*)malloc(ncircles * sizeof(circle));
+	spheres = (sphere_gpu_openmp*)malloc(nspheres * sizeof(sphere_gpu_openmp));
+	quads = (quad_gpu_openmp*)malloc(nquads * sizeof(quad_gpu_openmp));
+	circles = (circle_gpu_openmp*)malloc(ncircles * sizeof(circle_gpu_openmp));
+	
 	sphere_ids = (int*)malloc(nspheres * sizeof(int));
 	quad_ids = (int*)malloc(nquads * sizeof(int));
 	circle_ids = (int*)malloc(ncircles * sizeof(int));
@@ -209,7 +211,7 @@ void hittable_list_gpu_openmp::initialize()
 		new (&dielectrics[i]) dielectric(dielectrics_temp[i]);
 
 // Copying the shapes information to the GPU
-#pragma omp target enter data map(to: shape_mat_info[0:nshapes][0:2])
+#pragma omp target enter data map(to: shapes_mat_info[0:nshapes][0:2])
 #pragma omp target enter data map(to: sphere_ids[0:nspheres])
 #pragma omp target enter data map(to: spheres[0:nspheres])
 #pragma omp target enter data map(to: quad_ids[0:nquads])
@@ -223,7 +225,7 @@ void hittable_list_gpu_openmp::initialize()
 // Copying the materials info to the GPU
 #pragma omp target enter data map(to: metals[0:nmetals])
 #pragma omp target enter data map(to: lambertians[0:nlambertians])
-#pragma omp target enter data map(to: dielectric[0:ndielectric])
+#pragma omp target enter data map(to: dielectrics[0:ndielectrics])
 
 /*
  * Other materials
